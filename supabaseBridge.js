@@ -49,7 +49,7 @@ import('./js/UI/supabaseClient.js')
           }
         } catch (e) { console.warn('[supabase] save threw:', e); }
         // local fallback
-        try { localStorage.setItem('cmo_save_' + slot, JSON.stringify(data)); console.log('[supabase] local save ✓', slot); return true; }
+                try { localStorage.setItem('cmo_save_slot_' + slot, JSON.stringify(data)); console.log('[supabase] local save ✓', slot); return true; }
         catch (e) { console.error('local save failed:', e); return false; }
       },
 
@@ -63,7 +63,7 @@ import('./js/UI/supabaseClient.js')
           }
         } catch (e) { console.warn('[supabase] load threw:', e); }
         // local fallback
-        try { const raw = localStorage.getItem('cmo_save_' + slot); if (raw) { console.log('[supabase] local load ✓', slot); return JSON.parse(raw); } }
+                try { const raw = localStorage.getItem('cmo_save_slot_' + slot); if (raw) { console.log('[supabase] local load ✓', slot); return JSON.parse(raw); } }
         catch (e) { console.error('local load failed:', e); }
         return null;
       },
@@ -101,7 +101,7 @@ import('./js/UI/supabaseClient.js')
           }
         } catch (e) { console.warn('[supabase] delete threw:', e); }
         // local delete
-        try { localStorage.removeItem('cmo_save_' + slot); console.log('[supabase] local delete ✓', slot); } catch(e) {}
+                try { localStorage.removeItem('cmo_save_slot_' + slot); console.log('[supabase] local delete ✓', slot); } catch(e) {}
         return true;
       }
     };

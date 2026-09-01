@@ -241,6 +241,10 @@ function createShip(spec, side, x, y) {
 
 window.startScenario = function(scenario) {
   try { hideModal(); } catch(e) {}
+  // Hide login gate if visible — entering game area
+  const g = document.getElementById('loginGate');
+  if (g) g.style.display = 'none';
+  window._cmoAuthed = true;
   console.log('CMO: Starting scenario:', scenario);
   _('mainMenu').style.display = 'none';
   _('topbar').style.display='flex';
