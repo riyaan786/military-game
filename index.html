@@ -9,6 +9,17 @@
 html,body{width:100%;height:100%;overflow:hidden;background:#080c12;color:#e0e8f0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:14px;user-select:none}
 canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%;background:#060a10;z-index:0}
 #mainMenu{display:flex;position:fixed;top:0;left:0;right:0;bottom:0;z-index:300;justify-content:center;align-items:center;background:radial-gradient(ellipse at center,#0d1a28,#060a10);flex-direction:column;gap:24px}
+#loginGate{position:fixed;inset:0;background:linear-gradient(165deg,#071225 0%,#0a1a2f 45%,#0b1324 100%);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .35s}
+#loginGate{display:flex}#loginGate .card{background:linear-gradient(180deg,rgba(30,50,80,.72),rgba(15,28,50,.78));border:1px solid rgba(255,204,64,.28);border-radius:12px;padding:32px 34px;max-width:360px;width:92%;box-shadow:0 0 60px rgba(0,130,255,.18);backdrop-filter:blur(6px)}
+#loginGate h2{color:#ffaa40;font-size:22px;font-weight:700;margin:0 0 6px;text-align:center}
+#loginGate p{color:#8ab4f0;font-size:11px;margin:0 0 18px;opacity:.82;text-align:center}
+#loginGate input{width:100%;background:#0a1220;border:1px solid rgba(255,204,64,.28);color:#e0e8f0;padding:9px 12px;border-radius:6px;font-size:12px;outline:none;margin-bottom:12px}
+#loginGate input::placeholder{color:#6a8195}
+#loginGate button{width:100%;padding:10px;background:linear-gradient(180deg,#ff8c20,#e65e00);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:.18s}
+#loginGate button:hover{filter:brightness(1.12);box-shadow:0 0 16px rgba(255,140,0,.35)}
+#loginGate .alt{text-align:center;font-size:11px;color:#8ab4f0;margin-top:14px}.alt span.cursor{cursor:pointer;color:#ffaa40}.alt span.err{color:#ff6b6b}
+#loginGate .logo{display:block;width:80px;height:80px;margin:0 auto 16px;background:radial-gradient(circle,#ffaa40,#071225);border:2px solid #ff8c20;border-radius:50%;box-shadow:0 0 28px rgba(255,170,64,.45);display:flex;align-items:center;justify-content:center;font-size:32px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 28px rgba(255,170,64,.45);transform:scale(1)}50%{box-shadow:0 0 42px rgba(255,170,64,.7);transform:scale(1.05)}}
 #mainMenu .title{font-size:48px;font-weight:700;color:#ffaa40;letter-spacing:3px;text-shadow:0 0 40px rgba(255,170,64,0.2)}
 #mainMenu .subtitle{font-size:16px;color:rgba(255,170,64,0.5);letter-spacing:8px;text-transform:uppercase;margin-top:-8px}
 #mainMenu .menu-btns{display:flex;flex-direction:column;gap:14px;margin-top:20px}
@@ -44,13 +55,24 @@ canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%;backgrou
 #modal .box label{color:rgba(90,122,138,0.7);font-size:10px;display:block;margin:8px 0 3px}
 #modal .box input,#modal .box select{width:100%;background:rgba(10,15,22,0.8);border:1px solid rgba(255,170,64,0.1);color:#c8d8e8;padding:6px 10px;font-size:11px;border-radius:4px}
 #statusOverlay{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:90;pointer-events:none;display:none;text-align:center}
-#statusOverlay.show{display:block;pointer-events:auto}#statusOverlay .main{font-size:28px;font-weight:700;color:#ffaa44}#statusOverlay .sub{font-size:13px;opacity:0.5;letter-spacing:2px}
+#statusOverlay{display:block;pointer-events:auto}#statusOverlay .main{font-size:28px;font-weight:700;color:#ffaa44}#statusOverlay .sub{font-size:13px;opacity:0.5;letter-spacing:2px}
 #statusOverlay .close-btn{display:none;margin-top:20px;padding:10px 32px;background:rgba(40,60,80,0.5);border:1px solid rgba(255,255,255,0.1);color:#8ab4e8;font-size:13px;cursor:pointer;border-radius:5px;letter-spacing:1px}
 #statusOverlay.show .close-btn{display:inline-block}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,170,64,0.15)}
 </style>
 </head>
 <body>
+
+<div id="loginGate">
+  <div class="card">
+    <div class="logo">⚡</div>
+    <h2 id="loginTitle">🔐 WELCOME TO COMMAND CHAOS</h2>
+    <p id="loginMsg">Sign in to command your forces.</p>
+        <button id="googleBtn" type="button" style="width:100%;padding:12px;background:#fff;color:#333;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid #ddd">GOOGLE SIGN IN</button>
+  </div>
+</div>
+
+
 <div id="mainMenu">
   <div class="title">⚡ COMMAND CHAOS</div>
   <div class="subtitle">Modern Warfare · Strategy · Mayhem</div>
@@ -94,7 +116,81 @@ window.showAboutMe = function() {
   document.body.appendChild(d);
 };
 </script>
+
+<script>
+/* Pre-menu login gate - Google sign-in required */
+(function () {
+
+  console.log('[gate] init - waiting for Supabase module');
+  function getSBA() { return (window.cmoSupabase && window.cmoSupabase.supabase) ? window.cmoSupabase : null; }
+  const $ = (id) => document.getElementById(id);
+  const gateEl    = $('loginGate');
+  const googleBtn = $('googleBtn');
+
+        // Login gate is shown until the user explicitly clicks "Google Sign In".
+
+
+  function passGate() {
+    window._cmoAuthed = true;
+    if (!gateEl) return;
+    gateEl.style.opacity = '0';
+    gateEl.style.transition = 'opacity 0.3s';
+    setTimeout(() => {
+      gateEl.style.display = 'none';
+      const menu = $('mainMenu'); if (menu) menu.style.display = 'flex';
+    }, 320);
+  }
+
+    let _ticks = 0;
+  const _poll = setInterval(() => {
+    _ticks++;
+    const sb = getSBA();
+    if (sb) {
+      clearInterval(_poll);
+      console.log('[gate] Supabase ready');
+      // Register auth listener — only pass the gate when the USER explicitly
+      // initiated a Google login (tracked via sessionStorage across the redirect).
+      sb.onAuthChange(function (event, user) {
+        if (event === 'SIGNED_IN' && user && sessionStorage.getItem('_loginInitiated') === 'true') {
+          sessionStorage.removeItem('_loginInitiated');
+          console.log('[gate] user explicitly logged in → passGate');
+          passGate();
+        }
+      });
+      // DON'T auto-probe session or auto-pass the gate.  The login gate
+      // stays visible until the user clicks "Google Sign In" or uses the
+            // stays visible until the user clicks "Google Sign In".
+      if (gateEl) gateEl.style.display = 'flex';
+      if (googleBtn) {
+        googleBtn.onclick = async () => {
+          googleBtn.disabled = true; googleBtn.textContent = 'REDIRECTING...';
+          sessionStorage.setItem('_loginInitiated', 'true');  // survives redirect
+          try {
+            await getSBA().loginWithGoogle();
+          } catch(e) {
+            console.error('[gate] Google login failed:', e);
+            sessionStorage.removeItem('_loginInitiated');
+            googleBtn.disabled = false; googleBtn.textContent = 'GOOGLE SIGN IN';
+          }
+        };
+      }
+    } else if (_ticks > 40) {
+      clearInterval(_poll);
+      console.warn('[gate] Supabase never loaded - login gate remains');
+    }
+  }, 120);
+
+  window.addEventListener('load', () => {
+    if (gateEl && getComputedStyle(gateEl).display !== 'none' && !window._cmoAuthed) {
+      const menu = $('mainMenu'); if (menu) menu.style.display = 'none';
+    }
+  });
+
+})();
+</script>
+
 <div id="topbar">
+
   <span class="logo">◈ CMO</span>
   <span class="sep"></span>
   <button id="btnPause">▶ PLAY</button>
@@ -115,7 +211,8 @@ window.showAboutMe = function() {
   <button id="btnSave">💾 SAVE</button>
   <button id="btnLoad">📂 LOAD</button>
   <button id="btnSide">🚩 SIDE</button>
-  <button id="btnMenu">☰ MENU</button>
+    <button id="btnMenu">☰ MENU</button>
+  <button id="btnAccount" title="Supabase login / cloud saves">🔑 LOGIN</button>
   <span class="info" id="tbInfo">T:0|READY</span>
 </div>
 
@@ -162,11 +259,12 @@ window.showAboutMe = function() {
 <script src="js/DATA/military40.js"></script>
 <script src="js/DATA/nationDefense.js"></script>
 <script src="js/DATA/buildings.js"></script>
-<script src="js/CORE/engine.js"></script>
+<script src="js/CORE/engine.js?v=4"></script>
 <script src="js/CORE/sideManager.js"></script>
 <script src="js/SIMULATION/intelligentTargetAllocationSystem.js"></script>
 <script src="terrain.js"></script>
-<script src="js/CORE/game.js?v=3"></script>
-<script src="js/CORE/game_render.js?v=2"></script>
+<script src="supabaseBridge.js?v=6"></script>
+<script src="js/CORE/game.js?v=9"></script>
+<script src="js/CORE/game_render.js?v=5"></script>
 </body>
 </html>

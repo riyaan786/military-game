@@ -160,61 +160,63 @@ function r(t) {
   const dt = lt ? Math.min((t - lt) / 1000, 1) : 0;
   lt = t;
 
-  // Clear canvas
+    // Clear canvas (full backing store at devicePixelRatio resolution)
   cx.fillStyle = '#060a10';
-  cx.fillRect(0, 0, cw, ch);
+  cx.fillRect(0, 0, cv.width, cv.height);
 
-  // Draw map (always, even before game starts)
-  // Uses dual-resolution: low-res for wide views, high-res clipped for zoomed-in
+    // Draw map (always, even before game starts)
+  // Uses triple-resolution: low-res for wide views, medium-res (2× cache) as
+  // fallback while the 53 MB high-res PNG loads, then high-res (4.5× source)
+  // with source-clipping for fully zoomed-in views.
   if (A.map) {
     const camX = S && S.camX ? S.camX : W.mapW / 2;
     const camY = S && S.camY ? S.camY : W.mapH / 2;
     const zoom = S && S.zoom ? S.zoom : 0.5;
     cx.save();
+    cx.scale(dpr, dpr);               // ← devicePixelRatio: render sharp on Retina
     cx.translate(cw / 2, ch / 2);
     cx.scale(zoom, zoom);
     cx.translate(-camX, -camY);
+    cx.imageSmoothingEnabled = true;
+    cx.imageSmoothingQuality = 'high';
 
-    // HIGH-RES SOURCE CLIPPING: When zoomed in > 0.3, draw only the visible region
-    // of the 16384×8192 high-res map instead of stretching the low-res one
-    if (zoom > 0.3 && A.mapHigh && A.mapHigh.complete && A.mapHigh.naturalWidth > 0) {
-      // Calculate visible world rect (in game coords: 3600×1800)
-      const halfW = cw / 2 / zoom;
-      const halfH = ch / 2 / zoom;
-      const vpLeft = camX - halfW;
-      const vpTop = camY - halfH;
-      const vpRight = camX + halfW;
-      const vpBottom = camY + halfH;
-
-      // Scale factors: high-res map is 16384×8192, game world is 3600×1800
-      const sclX = A.mapHigh.naturalWidth / W.mapW;   // ~4.55
-      const sclY = A.mapHigh.naturalHeight / W.mapH;   // ~4.55
-
-      // Convert visible world rect to high-res image pixel coords
-      const sx = Math.max(0, vpLeft * sclX);
-      const sy = Math.max(0, vpTop * sclY);
-      const sw = Math.min(A.mapHigh.naturalWidth - sx, (vpRight - vpLeft) * sclX);
-      const sh = Math.min(A.mapHigh.naturalHeight - sy, (vpBottom - vpTop) * sclY);
-
-      // Draw only the visible slice of the high-res map onto the world coords
-      if (sw > 0 && sh > 0) {
-        cx.drawImage(
-          A.mapHigh,
-          sx, sy, sw, sh,             // source: high-res pixel region
-          sx / sclX, sy / sclY,       // dest: world coords (convert back)
-          sw / sclX, sh / sclY
-        );
+    // ZOOMED-IN: clip the high-res map source to the visible viewport
+    if (zoom > 0.3) {
+      // Prefer the 53 MB high-res image; fall back to the 2× medium cache
+      // until the large image finishes loading.
+      const srcMap   = (A.mapHigh && A.mapHigh.complete && A.mapHigh.naturalWidth > 0) ? A.mapHigh : A.mapMedium;
+      if (srcMap) {
+        const halfW  = cw / 2 / zoom;
+        const halfH  = ch / 2 / zoom;
+        const vpLeft = camX - halfW;
+        const vpTop  = camY - halfH;
+        const sclX   = srcMap.width  / W.mapW;
+        const sclY   = srcMap.height / W.mapH;
+        const sx     = Math.max(0, vpLeft * sclX);
+        const sy     = Math.max(0, vpTop  * sclY);
+        const sw     = Math.min(srcMap.width  - sx, (camX + halfW - vpLeft)  * sclX);
+        const sh     = Math.min(srcMap.height - sy, (camY + halfH - vpTop)   * sclY);
+        if (sw > 0 && sh > 0) {
+          cx.drawImage(srcMap,
+            sx, sy, sw, sh,                 // source: high-res pixel region
+            vpLeft, vpTop,                  // dest: world coords
+            sw / sclX, sh / sclY            // dest size: world units
+          );
+        }
       }
     } else {
-      // Low zoom: use the low-res map stretched across the full world
-      cx.drawImage(A.map, 0, 0);
+      // Low zoom: stretch low-res map across the full world
+      cx.drawImage(A.map, 0, 0, W.mapW, W.mapH);
     }
     cx.restore();
   } else {
+    cx.save();
+    cx.scale(dpr, dpr);               // ← devicePixelRatio
     cx.fillStyle = 'rgba(80,150,240,0.3)';
     cx.font = '12px sans-serif';
     cx.textAlign = 'center';
     cx.fillText('LOADING...', cw / 2, ch / 2);
+    cx.restore();
     requestAnimationFrame(r);
     return;
   }
@@ -227,6 +229,7 @@ function r(t) {
   const fontSize = Math.max(4, Math.min(12, 7 * sc));
 
   cx.save();
+  cx.scale(dpr, dpr);               // ← devicePixelRatio: render sharp on Retina
   cx.translate(cw / 2, ch / 2);
   cx.scale(sc, sc);
   cx.translate(-S.camX, -S.camY);

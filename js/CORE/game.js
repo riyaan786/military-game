@@ -38,11 +38,16 @@ let detectionDelays = {};
 const cv = document.createElement('canvas');
 const cx = cv.getContext('2d');
 document.body.prepend(cv);
-let cw, ch;
+    let cw, ch, dpr;
 function resize() {
+  dpr = window.devicePixelRatio || 1;
   const r = cv.getBoundingClientRect();
-  cw = cv.width = r.width || innerWidth;
-  ch = cv.height = r.height || innerHeight;
+  cw = r.width || innerWidth;
+  ch = r.height || innerHeight;
+  cv.width  = cw * dpr;
+  cv.height = ch * dpr;
+  cv.style.width  = cw + 'px';
+  cv.style.height = ch + 'px';
 }
 setTimeout(resize, 50);
 addEventListener('resize', resize);
@@ -67,6 +72,23 @@ function la(k, s) {
 }
 la('map','assets/world_small.jpg');
 la('mapHigh','assets/world_shaded_43k.jpg');
+
+// MEDIUM-RES fallback cache (2×) for while the 53MB high-res map loads.
+(function(){
+  const I = new Image();
+  I.onload = function() {
+    const oc = document.createElement('canvas');
+    oc.width  = W.mapW * 2;
+    oc.height = W.mapH * 2;
+    const octx = oc.getContext('2d');
+    octx.imageSmoothingEnabled = true;
+    octx.imageSmoothingQuality = 'high';
+    octx.drawImage(I, 0, 0, oc.width, oc.height);
+    A.mapMedium = oc;
+    console.log('[map] medium-res cache ready', oc.width + '×' + oc.height);
+  };
+  I.src = 'assets/world_small.jpg';
+})();
 
 function ll(lat,lng){return{x:(lng+180)/360*W.mapW,y:(90-lat)/180*W.mapH};}
 
@@ -481,31 +503,130 @@ _('btn10x').onclick=()=>{S.spd=10;hl('btn10x');if(S.pause){S.pause=false;_('btnP
 
 _('btnSave').onclick=()=>{
   if(!S){lg('No game to save');return;}
-  const data = JSON.stringify({
-    tick:S.tick,pause:S.pause,spd:S.spd,camX:S.camX,camY:S.camY,zoom:S.zoom,
-    ac:S.ac.map(a=>({id:a.id,side:a.side,name:a.name,x:a.x,y:a.y,tx:a.tx,ty:a.ty,h:a.h,fu:a.fu,hp:a.hp,alive:a.alive,role:a.role,wp:a.wp,spd:a.spd,isTanker:a.isTanker,isAwacs:a.isAwacs,landingAt:a.landingAt,spawnDelay:a.spawnDelay})),
+  showSaveSlotModal('save');
+};
+_('btnLoad').onclick=()=>{
+  showSaveSlotModal('load');
+};
+_('btnMenu').onclick=()=>{document.location.reload();};
+function hl(id){['btn05x','btn1x','btn5x','btn10x'].forEach(i=>_(i).classList.remove('active'));_(id).classList.add('active');}
+
+// ---- SAVE SLOT SYSTEM (5 slots, named, cloud-synced via email) ----
+function getSaveData() {
+  return {
+    tick:S.tick, pause:S.pause, spd:S.spd, camX:S.camX, camY:S.camY, zoom:S.zoom,
+    ac:S.ac.map(a=>({id:a.id,side:a.side,name:a.name,x:a.x,y:a.y,tx:a.tx,ty:a.ty,h:a.h,fu:a.fu,hp:a.hp,alive:a.alive,role:a.role,wp:a.wp,spd:a.spd,isTanker:a.isTanker,isAwacs:a.isAwacs,landingAt:a.landingAt,spawnDelay:a.spawnDelay,evadeT:a.evadeT||0,flareT:a.flareT||0,cm:a.cm||0})),
     sam:S.sam.map(s=>({id:s.id,side:s.side,name:s.name,x:s.x,y:s.y,hp:s.hp,maxM:s.maxM,reload:s.reload,alive:s.alive})),
     bases:S.bases.map(b=>({id:b.id,name:b.name,side:b.side,x:b.x,y:b.y,ac:b.ac,maxAC:b.maxAC,runways:b.runways,hp:b.hp,isCarrier:b.isCarrier,t:b.t,aircraftType:b.aircraftType})),
     bm:S.bm.map(b=>({id:b.id,side:b.side,name:b.name,x:b.x,y:b.y,alive:b.alive,launched:b.launched,damage:b.damage,rangeKM:b.rangeKM,speedMach:b.speedMach,spd:b.spd})),
     ships:S.ships.map(s=>({id:s.id,side:s.side,name:s.name,x:s.x,y:s.y,tx:s.tx,ty:s.ty,h:s.h,hp:s.hp,alive:s.alive,spd:s.spd,radarKM:s.radarKM,stealth:s.stealth,wp:s.wp,role:s.role,aircraftType:s.aircraftType}))
-  });
-  localStorage.setItem('cmo_save', data);
-  lg('💾 Game saved!');
-};
-_('btnLoad').onclick=()=>{
-  const data = localStorage.getItem('cmo_save');
-  if(!data){lg('📂 No save found');return;}
-  try {
-    const d = JSON.parse(data);
-    if(!S)return;
-    Object.assign(S, d);
-    S.gameover=false; S.pan=false; S.sel=null; S.sels=[]; S.addMode=null; S.bmLaunchMode=false;
-    _('btnPause').textContent='⏸ PAUSE';
-    lg('📂 Game loaded! T:'+S.tick);
-  } catch(e){lg('⚠️ Save file corrupted');}
-};
-_('btnMenu').onclick=()=>{document.location.reload();};
-function hl(id){['btn05x','btn1x','btn5x','btn10x'].forEach(i=>_(i).classList.remove('active'));_(id).classList.add('active');}
+  };
+}
+
+function restoreSaveData(d) {
+  Object.assign(S, d);
+  S.gameover = false; S.pan = false; S.sel = null; S.sels = []; S.addMode = null; S.bmLaunchMode = false;
+  S.gameStarted = true;
+  _('btnPause').textContent = '⏸ PAUSE';
+  lg('📂 Game loaded! T:' + S.tick);
+}
+
+function loadSlotInfo(slot) {
+  const local = localStorage.getItem('cmo_save_slot_' + slot);
+  const info = { hasLocal: !!local, hasCloud: false, name: 'Slot ' + slot, tick: 0, source: '---' };
+  if (local) {
+    try {
+      const d = JSON.parse(local);
+      info.name = d.saveName || 'Slot ' + slot;
+      info.tick = d.tick || 0;
+      info.source = '📱';
+    } catch(e) {}
+  }
+  // Check cloud (async — will update modal after resolve)
+  const sb = window.cmoSupabase;
+  if (sb && sb.isAuthenticated) {
+    sb.getAllSaves().then(cloudSaves => {
+      if (cloudSaves[slot] && cloudSaves[slot].save_data) {
+        const d = cloudSaves[slot].save_data;
+        info.hasCloud = true;
+        info.name = d.saveName || 'Slot ' + slot;
+        info.tick = d.tick || 0;
+        info.source = '☁ ' + (sb.userEmail ? sb.userEmail.split('@')[0] : 'cloud');
+        // Update the slot button in the modal
+        const btn = document.getElementById('slotBtn' + slot);
+        if (btn) {
+          btn.innerHTML = '<span style="color:#66ccff">' + info.name + '</span> ' + info.source + ' · T:' + info.tick;
+        }
+      }
+    }).catch(() => {});
+  }
+  return info;
+}
+
+async function showSaveSlotModal(mode) {
+  hideModal(); // close any open modal
+  let html = '<h3 style="color:#ffcc44">' + (mode === 'save' ? '💾 SAVE GAME' : '📂 LOAD GAME') + '</h3><p style="color:#c8ddf0;font-size:12px;margin:8px 0">Email: ' + ((window.cmoSupabase && window.cmoSupabase.userEmail) || 'not signed in') + '</p>';
+  for (let i = 1; i <= 5; i++) {
+    const info = loadSlotInfo(i);
+    html += '<div style="margin:6px 0"><button id="slotBtn' + i + '" onclick="' + (mode === 'save' ? 'saveToSlot(' + i + ')' : 'loadFromSlot(' + i + ')') + '" style="width:100%;padding:10px;background:linear-gradient(180deg,#1a3050,#142840);color:#5aacff;border:1px solid rgba(43,111,219,0.3);border-radius:3px;cursor:pointer;text-align:left;font-size:13px">' + info.name + ' ' + info.source + ' · T:' + info.tick + '</button></div>';
+  }
+  html += '<div style="margin-top:12px"><button onclick="hideModal()" style="width:100%;padding:8px;background:#182230;color:#5a7a8a;border:1px solid rgba(43,111,219,0.1);border-radius:3px;cursor:pointer">CANCEL</button></div>';
+  showModal(html);
+  // Cloud slots will update their labels asynchronously as they resolve
+}
+
+async function saveToSlot(slot) {
+  const data = getSaveData();
+  const name = prompt('Name this save (Enter = "Slot ' + slot + '"):') || 'Slot ' + slot;
+  data.saveName = name;
+  
+  // Save to cloud first (if authenticated), then local fallback
+  const sb = window.cmoSupabase;
+  if (sb && sb.isAuthenticated) {
+    try {
+      await sb.saveGame(slot, data);
+      console.log('[save] cloud slot ' + slot);
+    } catch(e) {
+      console.warn('[save] cloud failed, local fallback:', e);
+      localStorage.setItem('cmo_save_slot_' + slot, JSON.stringify(data));
+    }
+  } else {
+    localStorage.setItem('cmo_save_slot_' + slot, JSON.stringify(data));
+  }
+  hideModal();
+  lg('💾 Saved to ' + name + ' (slot ' + slot + ')');
+}
+
+async function loadFromSlot(slot) {
+  const sb = window.cmoSupabase;
+  // Cloud first, then local
+  if (sb && sb.isAuthenticated) {
+    try {
+      const result = await sb.loadGame(slot);
+      if (result) {
+        restoreSaveData(result);
+        hideModal();
+        return;
+      }
+    } catch(e) {
+      console.warn('[load] cloud failed, trying local:', e);
+    }
+  }
+  // Local fallback
+  const local = localStorage.getItem('cmo_save_slot_' + slot);
+  if (local) {
+    try {
+      const d = JSON.parse(local);
+      restoreSaveData(d);
+      hideModal();
+      return;
+    } catch(e) {
+      lg('⚠️ Save corrupted');
+    }
+  }
+  lg('📂 No save found in slot ' + slot);
+  hideModal();
+}
 
 // ---- SIDE ASSIGNMENT SYSTEM ----
 window.assignSideToSelected = function(side) {
@@ -600,10 +721,10 @@ _('btnDelete').onclick=()=>{
   updateUnitList();
 };
 _('btnCopy').onclick=()=>{if(!S.sel){lg('Select first');return;}
-  showModal(`<h3>📋 Copy</h3><label>Copies (max50):</label><input type="number" id="copyCount" value="5" min="1" max="50">
+  showModal(`<h3>📋 Copy</h3><label>Copies (max 10):</label><input type="number" id="copyCount" value="5" min="1" max="10">
      <div class="btns" style="display:flex;gap:6px;margin-top:8px"><button onclick="doCopy()" style="flex:1;padding:6px;background:#1a3050;color:#5aacff;border:1px solid rgba(43,111,219,0.3);border-radius:3px;cursor:pointer">COPY</button><button onclick="hideModal()" style="flex:1;padding:6px;background:#182230;color:#5a7a8a;border:1px solid rgba(43,111,219,0.1);border-radius:3px;cursor:pointer">CANCEL</button></div>`);};
 window.doCopy=function(){
-  const n=Math.min(parseInt(_('copyCount').value)||1,50);
+  const n=Math.min(parseInt(_('copyCount').value)||1,10);
   const t=S.sel; if(!t||t.missionLock) return;
   let copied = 0;
   for(let i=0;i<n;i++){
@@ -1156,7 +1277,7 @@ function tick(){
 
   // ---- MOVE (fuel drain: ~3 min full throttle) + IDLE CIRCLING ----
   S.ac.forEach(a=>{if(!a.alive||a.spawnDelay>0){if(a.spawnDelay)a.spawnDelay--;return;}const dx=a.tx-a.x,dy=a.ty-a.y,d=Math.hypot(dx,dy);if(d>1){const ta=Math.atan2(dy,dx)*180/Math.PI+90;let df=ta-a.h;while(df>180)df-=360;while(df<-180)df+=360;a.h+=Math.sign(df)*Math.min(Math.abs(df),2);const rad=(a.h-90)*Math.PI/180,sm=a.thr?a.thr/100:1;a.x+=Math.cos(rad)*a.spd*sm;a.y+=Math.sin(rad)*a.spd*sm;a.x=Math.max(0,Math.min(W.mapW,a.x));a.y=Math.max(0,Math.min(W.mapH,a.y));a.fu=Math.max(0,a.fu-0.006*sm);}else{// Idle: rotate 360° in place (realistic orbiting)
-a.h=(a.h+0.8)%360;const rad=(a.h-90)*Math.PI/180,sm=a.thr?Math.max(0.1,(a.thr/100)*0.5):0.35;a.x+=Math.cos(rad)*a.spd*sm;a.y+=Math.sin(rad)*a.spd*sm;a.fu=Math.max(0,(a.fu||100)-0.003*sm);}if(a.wc>0)a.wc--;});
+a.h=(a.h+0.8)%360;const rad=(a.h-90)*Math.PI/180,sm=a.thr?Math.max(0.1,(a.thr/100)*0.5):0.35;a.x+=Math.cos(rad)*a.spd*sm;a.y+=Math.sin(rad)*a.spd*sm;a.fu=Math.max(0,(a.fu||100)-0.003*sm);}let _mi=null,_md=Infinity;for(let _k=0;_k<S.mis.length;_k++){const _m=S.mis[_k];if(!_m.alive||_m.isBallistic||_m.isA2G||_m.isNaval||_m.side===a.side)continue;const _kd=Math.hypot(_m.x-a.x,_m.y-a.y)*W.kpp;if(_kd<_md){_md=_kd;_mi=_m;}}if(_mi&&_md<40){const _missileBear=Math.atan2(_mi.y-a.y,_mi.x-a.x)*180/Math.PI+90;const _bear=(_missileBear+180)%360;let _df=_bear-a.h;while(_df>180)_df-=360;while(_df<-180)_df+=360;a.h+=Math.sign(_df)*Math.min(Math.abs(_df),8)*0.6;a.evadeT=20;if(!a._wpSaved){a._wpSaved=true;a._wx=a.tx;a._wy=a.ty;}a.tx=a.x+Math.cos(_bear*Math.PI/180)*1000;a.ty=a.y+Math.sin(_bear*Math.PI/180)*1000;if(_md<6&&!_mi.ecmRolled){_mi.ecmRolled=true;const _ms=typeof MISSILE_COMBAT_STATS!=='undefined'?MISSILE_COMBAT_STATS[_mi.nm]:null;const _ecc=_ms?_ms.eccm:90;const _ecm=a.ecm||50;const _dc=Math.max(0.10,Math.min(0.85,(_ecm-_ecc)/200+0.30));if(Math.random()<_dc){_mi.alive=false;S.exp.push({x:_mi.x,y:_mi.y,l:1,ml:30,sz:9});if(S.tick%30===0)lg('⛡ ' +a.name+' defeated '+_mi.nm+' via ECM/chaff');}else if((a.cm||0)>0&&(a.flareT||0)<=0){a.cm--;const _a2=Math.random()*Math.PI*2;_mi.tx=a.x+Math.cos(_a2)*20;_mi.ty=a.y+Math.sin(_a2)*20;a.flareT=45;S.exp.push({x:a.x,y:a.y,l:1,ml:25,sz:7});if(S.tick%30===0)lg('ὒ5 ' +a.name+' deployed flares ('+Math.max(0,a.cm)+' left)');}}}if(a.evadeT>0)a.evadeT--;else if(a._wpSaved){a.tx=a._wx;a.ty=a._wy;delete a._wpSaved;}if(a.flareT>0)a.flareT--;if(a.wc>0)a.wc--});
   S.ships.forEach(s=>{if(!s.alive)return;const dx=s.tx-s.x,dy=s.ty-s.y,d=Math.hypot(dx,dy);if(d>1){const ta=Math.atan2(dy,dx)*180/Math.PI+90;let df=ta-s.h;while(df>180)df-=360;while(df<-180)df+=360;s.h+=Math.sign(df)*Math.min(Math.abs(df),1);const rad=(s.h-90)*Math.PI/180;s.x+=Math.cos(rad)*s.spd;s.y+=Math.sin(rad)*s.spd;s.x=Math.max(0,Math.min(W.mapW,s.x));s.y=Math.max(0,Math.min(W.mapH,s.y));}});
 
   // ---- AIR-TO-AIR (fire rate limited) ----
@@ -1315,10 +1436,10 @@ a.h=(a.h+0.8)%360;const rad=(a.h-90)*Math.PI/180,sm=a.thr?Math.max(0.1,(a.thr/10
   const canABM = s.spec && s.spec.canInterceptBallisticMissiles;
   // Use the SAM's specified missile ID for speed, fallback to '40n6' for S-400 class
   const samMissileId = (s.spec && s.spec.missileID) || '40n6';
-  for(let i=0;i<S.mis.length;i++){const m=S.mis[i];if(!m.alive||m.isSAM||m.side===s.side)continue;if(m.isBallistic && !canABM)continue;const d=Math.hypot(m.x-s.x,m.y-s.y)*W.kpp;if(d<=s.rngE){const isp=CMO.missileGameSpeed(samMissileId);S.mis.push({id:"mis"+Date.now()+"_"+(Math.random()*99999|0),x:s.x,y:s.y,tx:m.x,ty:m.y,spd:isp,dmg:(s.spec&&s.spec.missileDMG)||100,nm:samMissileId,isSAM:true,intercepting:true,isBallistic:false,side:s.side,tr:[],alive:true});s.maxM--;s.reload=s.reloadMax;fired=true;break;}}if(fired)return;for(let i=0;i<S.ac.length;i++){const a=S.ac[i];if(!a.alive||a.side===s.side||!a.dt)continue;const d=Math.hypot(a.x-s.x,a.y-s.y)*W.kpp;if(d<=s.rngE){const interceptorSpd=CMO.missileGameSpeed(samMissileId);S.mis.push({id:"mis"+Date.now()+"_"+(Math.random()*99999|0),x:s.x,y:s.y,tx:a.x,ty:a.y,spd:interceptorSpd,dmg:(s.spec&&s.spec.missileDMG)||100,nm:samMissileId,isSAM:true,isBallistic:false,side:s.side,tr:[],alive:true});s.maxM--;s.reload=s.reloadMax;if(S.tick%10===0)lg('🚀 '+s.name+' engages '+a.name+' at '+Math.round(d)+'km');break;}}});
+  for(let i=0;i<S.mis.length;i++){const m=S.mis[i];if(!m.alive||m.isSAM||m.side===s.side)continue;if(m.isBallistic && !canABM)continue;const d=Math.hypot(m.x-s.x,m.y-s.y)*W.kpp;if(d<=s.rngE){const isp=CMO.missileGameSpeed(samMissileId)*3;S.mis.push({id:"mis"+Date.now()+"_"+(Math.random()*99999|0),x:s.x,y:s.y,tx:m.x,ty:m.y,spd:isp,dmg:(s.spec&&s.spec.missileDMG)||100,nm:samMissileId,isSAM:true,intercepting:true,isBallistic:false,side:s.side,tr:[],alive:true});s.maxM--;s.reload=s.reloadMax;fired=true;break;}}if(fired)return;for(let i=0;i<S.ac.length;i++){const a=S.ac[i];if(!a.alive||a.side===s.side||!a.dt)continue;const d=Math.hypot(a.x-s.x,a.y-s.y)*W.kpp;if(d<=s.rngE){const interceptorSpd=CMO.missileGameSpeed(samMissileId);S.mis.push({id:"mis"+Date.now()+"_"+(Math.random()*99999|0),x:s.x,y:s.y,tx:a.x,ty:a.y,spd:interceptorSpd,dmg:(s.spec&&s.spec.missileDMG)||100,nm:samMissileId,isSAM:true,isBallistic:false,side:s.side,tr:[],alive:true});s.maxM--;s.reload=s.reloadMax;if(S.tick%10===0)lg('🚀 '+s.name+' engages '+a.name+' at '+Math.round(d)+'km');break;}}});
 
-  // ---- INTERCEPTOR (check actual distance, not stale target position) ----
-  for(let i=S.mis.length-1;i>=0;i--){const m=S.mis[i];if(!m.alive||!m.intercepting)continue;for(let j=S.mis.length-1;j>=0;j--){const t=S.mis[j];if(t===m||!t.alive||t.isSAM||t.intercepting)continue;const dist=Math.hypot(m.x-t.x,m.y-t.y)*W.kpp;if(dist<8){t.alive=false;S.exp.push({x:t.x,y:t.y,l:1,ml:1,sz:8});m.alive=false;break;}}}
+    // ---- INTERCEPTOR (homing: track closest enemy missile, kill at 15km) ----
+  for(let i=S.mis.length-1;i>=0;i--){const m=S.mis[i];if(!m.alive||!m.intercepting)continue;let _bt=null,_bd=Infinity;for(let j=S.mis.length-1;j>=0;j--){const t=S.mis[j];if(t===m||!t.alive||t.isSAM||t.intercepting)continue;const _dist=Math.hypot(m.x-t.x,m.y-t.y)*W.kpp;if(_dist<_bd){_bd=_dist;_bt=t;}}if(_bt){m.tx=_bt.x;m.ty=_bt.y;if(_bd<15){_bt.alive=false;S.exp.push({x:_bt.x,y:_bt.y,l:1,ml:1,sz:8});m.alive=false;}}}
 
   // Missile cleanup: remove dead missiles, keep max 200
   // Use reverse loop to avoid filter() allocation on large arrays

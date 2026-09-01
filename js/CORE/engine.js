@@ -31,7 +31,7 @@ const WORLD = {
 // TIME CONTROL — everything derives from these values
 // ============================================================================
 const GAME_TICK_RATE = 60;          // tick() is called 60x per real second
-const GAME_COMPRESSION = 1;         // 1x = real-time (raise this to speed up sim time)
+const GAME_COMPRESSION = 5;         // 1x = real-time (raise this to speed up sim time)
 
 function pxPerSecond(kmh) {
   return (kmh / 3600) / WORLD.kpp;
@@ -53,7 +53,7 @@ function machToPxPerTick(mach) {
 // seconds and you need to store/compare it against S.tick or a per-tick
 // countdown.
 function secondsToTicks(sec) {
-  return (sec || 0) * GAME_TICK_RATE / GAME_COMPRESSION;
+    return (sec || 0) * GAME_TICK_RATE;  // real seconds -> ticks. GC only scales movement, NOT cooldown/reload timing
 }
 
 // ============================================================================
@@ -89,7 +89,9 @@ function createAircraft(spec, side, x, y) {
     radarKM: (spec && spec.radarKM) || 200,
     stealth: spec.stealth || false,
     rcs: spec.rcs || 5,
-    ecm: spec.ecm || 50,
+        ecm: spec.ecm || 50,
+    cm: (spec && spec.cm) || 40,        // countermeasures (flares/chaff) — expended vs inbound missiles
+    evadeT: 0, flareT: 0,
     spec: spec,
     wp: spec.defaultLoadout ? spec.defaultLoadout.map(w => ({...w})) : [{id:'aim120c',cnt:4}]
   };
