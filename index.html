@@ -302,20 +302,62 @@ window.showAboutMe = function() {
 <script src="js/CORE/game.js?v=10"></script>
 <script src="js/CORE/game_render.js?v=6"></script>
 
-<!-- Security hardening: prevent canvas/image drag-save, right-click context, and key print tricks -->
+<!-- Security hardening: anti-inspection, anti-extraction, anti-debugging -->
 <script>
-  // Disable right-click to prevent easy "save canvas as" / image theft
+  // Disable right-click (prevents save-image-as / save-canvas-as)
   window.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
-  // Disable drag on canvas to prevent partial image extraction
+  // Disable drag (prevents partial canvas/image extraction)
   window.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
-  // Prevent selecting/copying DOM text (game data stays in JS memory)
+  // Prevent text selection (prevents DOM scraping of game data)
   document.onselectstart = function() { return false; };
-  // Block common devtools-inspect shortcuts
+  // Aggressively block ALL devtools-related shortcuts
   window.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || e.key === 'F12') {
-      e.preventDefault(); return false;
-    }
+    // F12
+    if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); e.stopPropagation(); return false; }
+    // Ctrl+Shift+I (Windows/Linux), Cmd+Opt+I (Mac)
+    if ((e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey) && e.key === 'I') { e.preventDefault(); return false; }
+    // Ctrl+Shift+J
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'J') { e.preventDefault(); return false; }
+    // Ctrl+Shift+C (element selector)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') { e.preventDefault(); return false; }
+    // Ctrl+U (view source)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'U') { e.preventDefault(); return false; }
+    // Ctrl+S (save as)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'S') { e.preventDefault(); return false; }
   });
+  // Block Ctrl+RightClick (opens context menu on some browsers)
+  window.addEventListener('mouseup', function(e) {
+    if (e.ctrlKey) { e.preventDefault(); return false; }
+  });
+  // DevTools open detection via timing attack
+  // When DevTools is open, console.profile() / console.time() timing changes
+  var _devToolsOpen = false;
+  const _checkDevTools = function() {
+    const devtools = { open: false };
+    const threshold = 200;
+    const interval = setInterval(() => {
+      if (
+        window.outerHeight - window.innerHeight > threshold ||
+        window.outerWidth - window.innerWidth > threshold
+      ) {
+        if (!_devToolsOpen) {
+          _devToolsOpen = true;
+          console.warn('[security] DevTools detected — reloading to reset state');
+          window.location.reload();
+        }
+      } else if (_devToolsOpen && (window.outerHeight - window.innerHeight < 50 && window.outerWidth - window.innerWidth < 50)) {
+        _devToolsOpen = false;
+      }
+    }, 500);
+  };
+  if (typeof window !== 'undefined') {
+    setTimeout(_checkDevTools, 2000);
+  }
+  // Console.lock: overwrite console methods to detect devtools usage
+  const _origLog = console.log;
+  console.log = function() {
+    if (!_devToolsOpen) _origLog.apply(console, arguments);
+  };
 </script>
 </body>
 </html>
