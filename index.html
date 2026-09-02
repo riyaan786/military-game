@@ -16,7 +16,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#fef8f0;color:#2a2a3
 canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%;background:#060a10;z-index:0}
 #mainMenu{display:flex;position:fixed;top:0;left:0;right:0;bottom:0;z-index:300;justify-content:center;align-items:center;background:radial-gradient(ellipse at center,#e8e0d0,#fef8f0);flex-direction:column;gap:24px}
 #loginGate{position:fixed;inset:0;background:linear-gradient(165deg,#f8f0e0 0%,#e8e0d0 45%,#fef8f0 100%);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .35s}
-#loginGate{display:flex}#loginGate .card{background:linear-gradient(180deg,rgba(248,240,225,0.95),rgba(232,224,208,0.92));border:1px solid rgba(139,69,19,0.25);border-radius:12px;padding:32px 34px;max-width:360px;width:92%;box-shadow:0 0 40px rgba(139,69,19,0.15);backdrop-filter:blur(6px)}
+#loginGate{display:flex}#loginGate .card{background:linear-gradient(180deg,rgba(248,240,225,0.95),rgba(232,224,208,0.92));border:1px solid rgba(139,69,19,0.25);border-radius:16px;padding:40px 48px;max-width:480px;width:92%;box-shadow:0 0 48px rgba(139,69,19,0.18);backdrop-filter:blur(8px)}
 #loginGate h2{color:#8B4513;font-size:22px;font-weight:700;margin:0 0 6px;text-align:center}
 #loginGate p{color:#5D4037;font-size:11px;margin:0 0 18px;opacity:.82;text-align:center}
 #loginGate input{width:100%;background:#FFF8E1;border:1px solid rgba(139,69,19,0.25);color:#3E2723;padding:9px 12px;border-radius:6px;font-size:12px;outline:none;margin-bottom:12px}
@@ -24,7 +24,7 @@ canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%;backgrou
 #loginGate button{width:100%;padding:10px;background:linear-gradient(180deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:.18s}
 #loginGate button:hover{filter:brightness(1.12);box-shadow:0 0 16px rgba(139,69,19,0.35)}
 #loginGate .alt{text-align:center;font-size:11px;color:#5D4037;margin-top:14px}.alt span.cursor{cursor:pointer;color:#8B4513}.alt span.err{color:#8B0000}
-#loginGate .logo{display:block;width:80px;height:80px;margin:0 auto 16px;background:linear-gradient(135deg,#8B4513,#A0522D);border:2px solid #D2B48C;border-radius:50%;box-shadow:0 0 28px rgba(139,69,19,0.3);display:flex;align-items:center;justify-content:center;font-size:32px;animation:pulse 2s infinite}
+#loginGate .logo{display:block;width:220px;height:220px;margin:0 auto 16px;background:linear-gradient(135deg,#8B4513,#A0522D);border:3px solid #D2B48C;border-radius:50%;box-shadow:0 0 48px rgba(139,69,19,0.4);display:flex;align-items:center;justify-content:center;font-size:96px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 28px rgba(255,170,64,.45);transform:scale(1)}50%{box-shadow:0 0 42px rgba(255,170,64,.7);transform:scale(1.05)}}
 #mainMenu .title{font-size:48px;font-weight:700;color:#8B4513;letter-spacing:3px;text-shadow:0 0 40px rgba(139,69,19,0.1)}
 #mainMenu .subtitle{font-size:16px;color:rgba(139,69,19,0.6);letter-spacing:8px;text-transform:uppercase;margin-top:-8px}
@@ -73,8 +73,8 @@ canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%;backgrou
   <div class="card">
     <div class="logo">⚡</div>
     <h2 id="loginTitle">🔐 WELCOME TO COMMAND CHAOS</h2>
-    <p id="loginMsg">Sign in to command your forces.</p>
-        <button id="googleBtn" type="button" style="width:100%;padding:12px;background:#fff;color:#333;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid #ddd">GOOGLE SIGN IN</button>
+    <p id="loginMsg" style="margin-top:16px">Sign in to command your forces.</p>
+        <button id="googleBtn" type="button" style="width:100%;padding:14px;margin-top:24px;background:#fff;color:#333;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid #ddd">GOOGLE SIGN IN</button>
   </div>
 </div>
 
@@ -180,26 +180,11 @@ window.showAboutMe = function() {
       // DON'T auto-probe session or auto-pass the gate.  The login gate
       // stays visible until the user clicks "Google Sign In" or uses the
             // stays visible until the user clicks "Google Sign In".
-            if (gateEl) gateEl.style.display = 'flex';
+                  if (gateEl) gateEl.style.display = 'flex';
       if (googleBtn) {
         googleBtn.onclick = async () => {
-          // --- RATE LIMITING: max 3 login attempts per device per day ---
-          const today = new Date().toISOString().slice(0, 10);
-          const key = 'cmo_login_attempts_' + today;
-          let attempts = parseInt(localStorage.getItem(key) || '0');
-          if (attempts >= 3) {
-            googleBtn.disabled = true;
-            googleBtn.textContent = 'LIMIT REACHED · TRY TOMORROW';
-            googleBtn.style.background = '#ccc';
-            googleBtn.style.cursor = 'not-allowed';
-            console.warn('[gate] Login rate limit reached (3/day)');
-            return;
-          }
-          // Increment attempt counter
-          localStorage.setItem(key, String(attempts + 1));
-          // -------------------------------------------------------------
           googleBtn.disabled = true; googleBtn.textContent = 'REDIRECTING...';
-          sessionStorage.setItem('_loginInitiated', 'true');  // survives redirect
+          sessionStorage.setItem('_loginInitiated', 'true');
           try {
             await getSBA().loginWithGoogle();
           } catch(e) {
@@ -301,8 +286,9 @@ window.showAboutMe = function() {
 <script src="supabaseBridge.js?v=6"></script>
 <script src="js/CORE/game.js?v=10"></script>
 <script src="js/CORE/game_render.js?v=6"></script>
+<script src="js/CORE/analytics.js?v=1"></script>
 
-<!-- Security hardening: anti-inspection, anti-extraction, anti-debugging -->
+<!-- Security hardening: anti-extraction (no right-click, no save, no source view) -->
 <script>
   // Disable right-click (prevents save-image-as / save-canvas-as)
   window.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
@@ -310,13 +296,13 @@ window.showAboutMe = function() {
   window.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
   // Prevent text selection (prevents DOM scraping of game data)
   document.onselectstart = function() { return false; };
-  // Aggressively block ALL devtools-related shortcuts
+  // Block devtools source-view shortcuts
   window.addEventListener('keydown', function(e) {
     // F12
     if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); e.stopPropagation(); return false; }
-    // Ctrl+Shift+I (Windows/Linux), Cmd+Opt+I (Mac)
+    // Ctrl+Shift+I / Cmd+Opt+I (inspect)
     if ((e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey) && e.key === 'I') { e.preventDefault(); return false; }
-    // Ctrl+Shift+J
+    // Ctrl+Shift+J (console)
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'J') { e.preventDefault(); return false; }
     // Ctrl+Shift+C (element selector)
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') { e.preventDefault(); return false; }
@@ -329,35 +315,10 @@ window.showAboutMe = function() {
   window.addEventListener('mouseup', function(e) {
     if (e.ctrlKey) { e.preventDefault(); return false; }
   });
-  // DevTools open detection via timing attack
-  // When DevTools is open, console.profile() / console.time() timing changes
-  var _devToolsOpen = false;
-  const _checkDevTools = function() {
-    const devtools = { open: false };
-    const threshold = 200;
-    const interval = setInterval(() => {
-      if (
-        window.outerHeight - window.innerHeight > threshold ||
-        window.outerWidth - window.innerWidth > threshold
-      ) {
-        if (!_devToolsOpen) {
-          _devToolsOpen = true;
-          console.warn('[security] DevTools detected — reloading to reset state');
-          window.location.reload();
-        }
-      } else if (_devToolsOpen && (window.outerHeight - window.innerHeight < 50 && window.outerWidth - window.innerWidth < 50)) {
-        _devToolsOpen = false;
-      }
-    }, 500);
-  };
-  if (typeof window !== 'undefined') {
-    setTimeout(_checkDevTools, 2000);
-  }
-  // Console.lock: overwrite console methods to detect devtools usage
-  const _origLog = console.log;
-  console.log = function() {
-    if (!_devToolsOpen) _origLog.apply(console, arguments);
-  };
+  // NOTE: Removed the auto-reload-on-devtools-open — it breaks debugging.
+  // DevTools can still be opened manually via the browser menu — this is
+  // expected and unavoidable on the web. The above shortcuts are a light
+  // deterrent only.
 </script>
 </body>
 </html>

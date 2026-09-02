@@ -24,6 +24,7 @@ let S = {
   bmPendingTarget:null, bmLaunchMode:false,
   gameStarted:false, missionName:null
 };
+let _gameStartedTracked = false;  // Analytics: track if game_started event was sent
 const sides = [
   {id:'blue', name:'BLUFOR', color:'#2b6fdb', posture:'Friendly'},
   {id:'red', name:'OPFOR', color:'#db2b2b', posture:'Hostile'},
@@ -477,9 +478,14 @@ window.startScenario = function(scenario) {
     lg('BLANK SCENARIO — place units (land units on land, ships on water)');
   }
   
-  updateUnitList(); updateSideList();
+    updateUnitList(); updateSideList();
   _('btnPause').textContent = '▶ PLAY';
   if(scenario !== 'blank') showMissionBrief(scenario);
+  
+  // Analytics: session_start — player actively playing the game
+  if (window.cmoAnalytics) {
+    window.cmoAnalytics.trackEvent('session_start', { scenario: scenario });
+  }
 };
 
 _('btnPause').onclick=()=>{
@@ -497,9 +503,16 @@ _('btnPause').onclick=()=>{
       lg('⚠️ '+unassigned.length+' unit(s) need side assignment! Use SIDE ASSIGNMENT panel');
       return;
     }
+    // First time unpausing — game has started
+    if(!_gameStartedTracked && window.cmoAnalytics){
+      _gameStartedTracked = true;
+      window.cmoAnalytics.trackEvent('game_started', { scenario: S.missionName, tick: S.tick });
+    }
   }
   S.pause=!S.pause;_('btnPause').textContent=S.pause?'▶ PLAY':'⏸ PAUSE';
 };
+
+
 _('btn05x').onclick=()=>{S.spd=0.5;hl('btn05x');if(S.pause){S.pause=false;_('btnPause').textContent='⏸ PAUSE';}};
 _('btn1x').onclick=()=>{S.spd=1;hl('btn1x');if(S.pause){S.pause=false;_('btnPause').textContent='⏸ PAUSE';}};
 _('btn5x').onclick=()=>{S.spd=5;hl('btn5x');if(S.pause){S.pause=false;_('btnPause').textContent='⏸ PAUSE';}};
@@ -512,7 +525,7 @@ _('btnSave').onclick=()=>{
 _('btnLoad').onclick=()=>{
   showSaveSlotModal('load');
 };
-_('btnMenu').onclick=()=>{document.location.reload();};
+_('btnMenu').onclick=()=>{if(window.cmoAnalytics)window.cmoAnalytics.endSession();document.location.reload();};
 function hl(id){['btn05x','btn1x','btn5x','btn10x'].forEach(i=>_(i).classList.remove('active'));_(id).classList.add('active');}
 
 // ---- SAVE SLOT SYSTEM (5 slots, named, cloud-synced via email) ----
@@ -1440,10 +1453,18 @@ a.h=(a.h+0.8)%360;const rad=(a.h-90)*Math.PI/180,sm=a.thr?Math.max(0.1,(a.thr/10
   const canABM = s.spec && s.spec.canInterceptBallisticMissiles;
   // Use the SAM's specified missile ID for speed, fallback to '40n6' for S-400 class
   const samMissileId = (s.spec && s.spec.missileID) || '40n6';
-  for(let i=0;i<S.mis.length;i++){const m=S.mis[i];if(!m.alive||m.isSAM||m.side===s.side)continue;if(m.isBallistic && !canABM)continue;const d=Math.hypot(m.x-s.x,m.y-s.y)*W.kpp;if(d<=s.rngE){const isp=CMO.missileGameSpeed(samMissileId)*3;S.mis.push({id:"mis"+Date.now()+"_"+(Math.random()*99999|0),x:s.x,y:s.y,tx:m.x,ty:m.y,spd:isp,dmg:(s.spec&&s.spec.missileDMG)||100,nm:samMissileId,isSAM:true,intercepting:true,isBallistic:false,side:s.side,tr:[],alive:true});s.maxM--;s.reload=s.reloadMax;fired=true;break;}}if(fired)return;for(let i=0;i<S.ac.length;i++){const a=S.ac[i];if(!a.alive||a.side===s.side||!a.dt)continue;const d=Math.hypot(a.x-s.x,a.y-s.y)*W.kpp;if(d<=s.rngE){const interceptorSpd=CMO.missileGameSpeed(samMissileId);S.mis.push({id:"mis"+Date.now()+"_"+(Math.random()*99999|0),x:s.x,y:s.y,tx:a.x,ty:a.y,spd:interceptorSpd,dmg:(s.spec&&s.spec.missileDMG)||100,nm:samMissileId,isSAM:true,isBallistic:false,side:s.side,tr:[],alive:true});s.maxM--;s.reload=s.reloadMax;if(S.tick%10===0)lg('🚀 '+s.name+' engages '+a.name+' at '+Math.round(d)+'km');break;}}});
+  for(let i=0;i<S.mis.length;i++){const m=S.mis[i];if(!m.alive||m.isSAM||m.side===s.side)continue;if(m.isBallistic && !canABM)continue;const d=Math.hypot(m.x-s.x,m.y-s.y)*W.kpp;if(d<=s.rngE){const isp=CMO.missileGameSpeed(samMissileId)*3;S.mis.push({id:"mis"+Date.now()+"_"+(Math.random()*99999|0),x:s.x,y:s.y,tx:m.x,ty:m.y,spd:isp,dmg:(s.spec&&s.spec.missileDMG)||100,nm:samMissileId,isSAM:true,intercepting:true,isBallistic:false,side:s.side,tr:[],alive:true});s.maxM--;s.reload=s.reloadMax;fired=true;if(S.tick%15===0)lg('🛡 '+s.name+' intercepts enemy missile ['+Math.round(d)+'km]');break;}}if(fired)return;for(let i=0;i<S.ac.length;i++){const a=S.ac[i];if(!a.alive||a.side===s.side||!a.dt)continue;const d=Math.hypot(a.x-s.x,a.y-s.y)*W.kpp;if(d<=s.rngE){const interceptorSpd=CMO.missileGameSpeed(samMissileId);S.mis.push({id:"mis"+Date.now()+"_"+(Math.random()*99999|0),x:s.x,y:s.y,tx:a.x,ty:a.y,spd:interceptorSpd,dmg:(s.spec&&s.spec.missileDMG)||100,nm:samMissileId,isSAM:true,isBallistic:false,side:s.side,tr:[],alive:true});s.maxM--;s.reload=s.reloadMax;if(S.tick%10===0)lg('🚀 '+s.name+' engages '+a.name+' at '+Math.round(d)+'km');break;}}});
 
     // ---- INTERCEPTOR (homing: track closest enemy missile, kill at 15km) ----
-  for(let i=S.mis.length-1;i>=0;i--){const m=S.mis[i];if(!m.alive||!m.intercepting)continue;let _bt=null,_bd=Infinity;for(let j=S.mis.length-1;j>=0;j--){const t=S.mis[j];if(t===m||!t.alive||t.isSAM||t.intercepting)continue;const _dist=Math.hypot(m.x-t.x,m.y-t.y)*W.kpp;if(_dist<_bd){_bd=_dist;_bt=t;}}if(_bt){m.tx=_bt.x;m.ty=_bt.y;if(_bd<15){_bt.alive=false;S.exp.push({x:_bt.x,y:_bt.y,l:1,ml:1,sz:8});m.alive=false;}}}
+  for(let i=S.mis.length-1;i>=0;i--){const m=S.mis[i];if(!m.alive||!m.intercepting)continue;let _bt=null,_bd=Infinity;for(let j=S.mis.length-1;j>=0;j--){const t=S.mis[j];if(t===m||!t.alive||t.isSAM||t.intercepting)continue;const _dist=Math.hypot(m.x-t.x,m.y-t.y)*W.kpp;if(_dist<_bd){_bd=_dist;_bt=t;}}if(_bt){m.tx=_bt.x;m.ty=_bt.y;
+      // Kill radius: 15km standard, 25km for ballistic missiles (small fast targets)
+      const killRadius = _bt.isBallistic ? 25 : 15;
+      if(_bd<killRadius){
+        _bt.alive=false;
+        S.exp.push({x:_bt.x,y:_bt.y,l:1,ml:1,sz:_bt.isBallistic?12:8});
+        if(S.tick%30===0)lg('🎯 Intercepted '+(_bt.nm||'ballistic missile')+' at '+Math.round(_bd)+'km');
+        m.alive=false;
+      }}}
 
   // Missile cleanup: remove dead missiles, keep max 200
   // Use reverse loop to avoid filter() allocation on large arrays
@@ -1468,7 +1489,8 @@ a.h=(a.h+0.8)%360;const rad=(a.h-90)*Math.PI/180,sm=a.thr?Math.max(0.1,(a.thr/10
         S.ships.forEach(s=>{if(Math.hypot(s.x-m.tx,s.y-m.ty)<12){s.hp-=m.dmg;if(s.hp<=0){s.alive=false;lg('💥 '+s.name+' sunk!');updateUnitList();}}});
         lg('💥 Ballistic impact!');
       }
-      S.mis.splice(i,1);continue;
+      // Interceptor reached target position - target was already killed by homing loop
+      if(m.intercepting && S.tick%20===0)lg('🎯 Interceptor destroyed enemy missile');
     }
     const ang=Math.atan2(dy,dx);m.x+=Math.cos(ang)*m.spd;m.y+=Math.sin(ang)*m.spd;
     if(!m.tr)m.tr=[];m.tr.push({x:m.x,y:m.y});if(m.tr.length>30)m.tr.shift();
@@ -1499,7 +1521,8 @@ a.h=(a.h+0.8)%360;const rad=(a.h-90)*Math.PI/180,sm=a.thr?Math.max(0.1,(a.thr/10
     const blueACTotal = S.ac.filter(a=>a.side==='blue').length;
     const blueACAlive = S.ac.some(a=>a.alive&&a.side==='blue');
     const blueParked = S.bases.some(b=>b.side==='blue'&&b.ac>0);
-    if(blueACTotal>0 && !blueACAlive && !blueParked){S.gameover=true;_('statusMain').textContent='💥 ALL AIRCRAFT LOST';_('statusSub').textContent='MISSION FAILED';_('statusOverlay').classList.add('show');}
+        if(blueACTotal>0 && !blueACAlive && !blueParked){S.gameover=true;_('statusMain').textContent='💥 ALL AIRCRAFT LOST';_('statusSub').textContent='MISSION FAILED';_('statusOverlay').classList.add('show');
+      if(window.cmoAnalytics){window.cmoAnalytics.trackEvent('game_abandoned',{tick:S.tick,reason:'all_aircraft_lost'});window.cmoAnalytics.endSession();}}
     // Check mission success: all enemy SAMs, BMs, and non-friendly bases destroyed
     const enemySams=S.sam.filter(s=>s.side!=='blue').length;
     const enemySamsAlive=S.sam.filter(s=>s.side!=='blue'&&s.alive).length;
@@ -1508,8 +1531,9 @@ a.h=(a.h+0.8)%360;const rad=(a.h-90)*Math.PI/180,sm=a.thr?Math.max(0.1,(a.thr/10
     const enemyBases=S.bases.filter(b=>b.side!=='blue').length;
     const enemyBasesAlive=S.bases.filter(b=>b.side!=='blue'&&b.alive).length;
     if(enemySams>0&&enemySamsAlive===0&&enemyBms>0&&enemyBmsAlive===0&&enemyBases>0&&enemyBasesAlive===0){
-      S.gameover=true;_('statusMain').textContent='✅ MISSION SUCCESSFUL!';_('statusSub').textContent='ALL ENEMY TARGETS DESTROYED';_('statusOverlay').classList.add('show');
+            S.gameover=true;_('statusMain').textContent='✅ MISSION SUCCESSFUL!';_('statusSub').textContent='ALL ENEMY TARGETS DESTROYED';_('statusOverlay').classList.add('show');
       lg('🏆 MISSION COMPLETE! All OPFOR eliminated!');
+      if(window.cmoAnalytics){window.cmoAnalytics.trackEvent('game_completed',{tick:S.tick,duration:S.tick});window.cmoAnalytics.endSession();}
     }
   }
   } catch(e) { console.error('TICK CRASH:',e); }
