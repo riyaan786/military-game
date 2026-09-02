@@ -6,59 +6,59 @@
 <title>Command Chaos</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#080c12;color:#e0e8f0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:14px;user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#fef8f0;color:#2a2a3a;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:14px;user-select:none}
 canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%;background:#060a10;z-index:0}
-#mainMenu{display:flex;position:fixed;top:0;left:0;right:0;bottom:0;z-index:300;justify-content:center;align-items:center;background:radial-gradient(ellipse at center,#0d1a28,#060a10);flex-direction:column;gap:24px}
-#loginGate{position:fixed;inset:0;background:linear-gradient(165deg,#071225 0%,#0a1a2f 45%,#0b1324 100%);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .35s}
-#loginGate{display:flex}#loginGate .card{background:linear-gradient(180deg,rgba(30,50,80,.72),rgba(15,28,50,.78));border:1px solid rgba(255,204,64,.28);border-radius:12px;padding:32px 34px;max-width:360px;width:92%;box-shadow:0 0 60px rgba(0,130,255,.18);backdrop-filter:blur(6px)}
-#loginGate h2{color:#ffaa40;font-size:22px;font-weight:700;margin:0 0 6px;text-align:center}
-#loginGate p{color:#8ab4f0;font-size:11px;margin:0 0 18px;opacity:.82;text-align:center}
-#loginGate input{width:100%;background:#0a1220;border:1px solid rgba(255,204,64,.28);color:#e0e8f0;padding:9px 12px;border-radius:6px;font-size:12px;outline:none;margin-bottom:12px}
-#loginGate input::placeholder{color:#6a8195}
-#loginGate button{width:100%;padding:10px;background:linear-gradient(180deg,#ff8c20,#e65e00);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:.18s}
-#loginGate button:hover{filter:brightness(1.12);box-shadow:0 0 16px rgba(255,140,0,.35)}
-#loginGate .alt{text-align:center;font-size:11px;color:#8ab4f0;margin-top:14px}.alt span.cursor{cursor:pointer;color:#ffaa40}.alt span.err{color:#ff6b6b}
-#loginGate .logo{display:block;width:80px;height:80px;margin:0 auto 16px;background:radial-gradient(circle,#ffaa40,#071225);border:2px solid #ff8c20;border-radius:50%;box-shadow:0 0 28px rgba(255,170,64,.45);display:flex;align-items:center;justify-content:center;font-size:32px;animation:pulse 2s infinite}
+#mainMenu{display:flex;position:fixed;top:0;left:0;right:0;bottom:0;z-index:300;justify-content:center;align-items:center;background:radial-gradient(ellipse at center,#e8e0d0,#fef8f0);flex-direction:column;gap:24px}
+#loginGate{position:fixed;inset:0;background:linear-gradient(165deg,#f8f0e0 0%,#e8e0d0 45%,#fef8f0 100%);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .35s}
+#loginGate{display:flex}#loginGate .card{background:linear-gradient(180deg,rgba(248,240,225,0.95),rgba(232,224,208,0.92));border:1px solid rgba(139,69,19,0.25);border-radius:12px;padding:32px 34px;max-width:360px;width:92%;box-shadow:0 0 40px rgba(139,69,19,0.15);backdrop-filter:blur(6px)}
+#loginGate h2{color:#8B4513;font-size:22px;font-weight:700;margin:0 0 6px;text-align:center}
+#loginGate p{color:#5D4037;font-size:11px;margin:0 0 18px;opacity:.82;text-align:center}
+#loginGate input{width:100%;background:#FFF8E1;border:1px solid rgba(139,69,19,0.25);color:#3E2723;padding:9px 12px;border-radius:6px;font-size:12px;outline:none;margin-bottom:12px}
+#loginGate input::placeholder{color:#BCAAA4}
+#loginGate button{width:100%;padding:10px;background:linear-gradient(180deg,#8B4513,#A0522D);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:.18s}
+#loginGate button:hover{filter:brightness(1.12);box-shadow:0 0 16px rgba(139,69,19,0.35)}
+#loginGate .alt{text-align:center;font-size:11px;color:#5D4037;margin-top:14px}.alt span.cursor{cursor:pointer;color:#8B4513}.alt span.err{color:#8B0000}
+#loginGate .logo{display:block;width:80px;height:80px;margin:0 auto 16px;background:linear-gradient(135deg,#8B4513,#A0522D);border:2px solid #D2B48C;border-radius:50%;box-shadow:0 0 28px rgba(139,69,19,0.3);display:flex;align-items:center;justify-content:center;font-size:32px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 28px rgba(255,170,64,.45);transform:scale(1)}50%{box-shadow:0 0 42px rgba(255,170,64,.7);transform:scale(1.05)}}
-#mainMenu .title{font-size:48px;font-weight:700;color:#ffaa40;letter-spacing:3px;text-shadow:0 0 40px rgba(255,170,64,0.2)}
-#mainMenu .subtitle{font-size:16px;color:rgba(255,170,64,0.5);letter-spacing:8px;text-transform:uppercase;margin-top:-8px}
+#mainMenu .title{font-size:48px;font-weight:700;color:#8B4513;letter-spacing:3px;text-shadow:0 0 40px rgba(139,69,19,0.1)}
+#mainMenu .subtitle{font-size:16px;color:rgba(139,69,19,0.6);letter-spacing:8px;text-transform:uppercase;margin-top:-8px}
 #mainMenu .menu-btns{display:flex;flex-direction:column;gap:14px;margin-top:20px}
-#mainMenu .menu-btn{background:linear-gradient(180deg,rgba(30,50,70,0.6),rgba(15,25,40,0.6));border:1px solid rgba(43,111,219,0.25);color:#8ab4e8;padding:16px 52px;font-size:15px;cursor:pointer;border-radius:6px;transition:all 0.2s;letter-spacing:1.5px;text-align:center;min-width:360px}
-#mainMenu .menu-btn:hover{background:linear-gradient(180deg,rgba(40,70,90,0.7),rgba(20,35,55,0.7));border-color:rgba(43,111,219,0.5);color:#aaccff;box-shadow:0 0 30px rgba(43,111,219,0.12)}
+#mainMenu .menu-btn{background:linear-gradient(180deg,rgba(139,69,19,0.7),rgba(101,55,13,0.7));border:1px solid rgba(139,69,19,0.3);color:#5D4037;font-size:15px;cursor:pointer;border-radius:6px;transition:all 0.2s;letter-spacing:1.5px;text-align:center;min-width:360px}
+#mainMenu .menu-btn:hover{background:linear-gradient(180deg,rgba(160,82,45,0.8),rgba(139,69,19,0.8));border-color:rgba(139,69,19,0.5);color:#3E2723;box-shadow:0 0 30px rgba(139,69,19,0.2)}
 #mainMenu .social-links{display:flex;gap:16px;margin-top:6px}
-#mainMenu .social-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#8899aa;padding:8px 20px;font-size:11px;cursor:pointer;border-radius:4px;text-decoration:none;transition:all 0.2s;letter-spacing:0.5px}
-#mainMenu .social-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#aabbcc}
-#topbar{display:none;position:fixed;top:0;left:0;right:0;height:38px;background:rgba(10,15,26,0.92);border-bottom:1px solid rgba(255,170,64,0.12);z-index:100;align-items:center;padding:0 10px;gap:5px;backdrop-filter:blur(8px)}
-#topbar .logo{color:#ffaa40;font-weight:700;font-size:13px;letter-spacing:1px;margin-right:8px;white-space:nowrap}
-#topbar .sep{width:1px;height:18px;background:rgba(255,170,64,0.15);margin:0 5px}
-#topbar button{background:linear-gradient(180deg,#1a2a3a,#121a28);border:1px solid rgba(255,170,64,0.12);color:#b8d8f0;font-size:10px;padding:3px 9px;cursor:pointer;border-radius:4px;height:24px;white-space:nowrap;transition:all 0.15s}
-#topbar button:hover{background:linear-gradient(180deg,#22334a,#182838);border-color:rgba(255,170,64,0.25);color:#d0e8ff}
-#topbar button.active{background:linear-gradient(180deg,#1a3050,#142840);border-color:rgba(255,170,64,0.35);color:#5aacff}
-#topbar button.navy{background:linear-gradient(180deg,#1a2840,#142438);border-color:rgba(0,150,255,0.25);color:#60b8ff}
-#topbar button.navy:hover{background:linear-gradient(180deg,#1e3050,#182a40);border-color:rgba(0,150,255,0.4);color:#80ccff}
-#topbar .info{color:rgba(90,122,138,0.7);font-size:9px;margin-left:auto;font-family:'Courier New',monospace;white-space:nowrap}
-#sidebar{display:none;position:fixed;top:38px;left:0;width:280px;bottom:30px;background:rgba(10,15,26,0.92);border-right:1px solid rgba(255,170,64,0.08);z-index:50;overflow-y:auto;padding:0;backdrop-filter:blur(8px)}
-#sidebar .pane{border-bottom:1px solid rgba(255,170,64,0.06);padding:8px 12px}
-#sidebar .pane-title{color:rgba(255,170,64,0.7);font-size:8px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600}
-.srow{display:flex;justify-content:space-between;padding:3px 0;font-size:10px;line-height:1.6}.srow .l{color:rgba(90,122,138,0.7);font-size:9px}.srow .r{color:#c8d8e8;font-weight:500;font-size:10px}
-.srow .r.enemy{color:#ff5555}.srow .r.friendly{color:#4499ff}.srow .r.warn{color:#d4a040}.srow .r.good{color:#60d080}
+#mainMenu .social-btn{background:rgba(56,40,20,0.08);border:1px solid rgba(139,69,19,0.15);color:#5D4037;padding:8px 20px;font-size:11px;cursor:pointer;border-radius:4px;text-decoration:none;transition:all 0.2s;letter-spacing:0.5px}
+#mainMenu .social-btn:hover{background:rgba(56,40,20,0.15);border-color:rgba(139,69,19,0.25);color:#3E2723}
+#topbar{display:none;position:fixed;top:0;left:0;right:0;height:38px;background:rgba(253,248,240,0.95);border-bottom:1px solid rgba(139,69,19,0.15);z-index:100;align-items:center;padding:0 10px;gap:5px;backdrop-filter:blur(8px)}
+#topbar .logo{color:#8B4513;font-weight:700;font-size:13px;letter-spacing:1px;margin-right:8px;white-space:nowrap}
+#topbar .sep{width:1px;height:18px;background:rgba(139,69,19,0.15);margin:0 5px}
+#topbar button{background:linear-gradient(180deg,#D7CCC8,#BCAAA4);border:1px solid rgba(139,69,19,0.15);color:#3E2723;font-size:10px;padding:3px 9px;cursor:pointer;border-radius:4px;height:24px;white-space:nowrap;transition:all 0.15s}
+#topbar button:hover{background:linear-gradient(180deg,#E0E0E0,#D7CCC8);border-color:rgba(139,69,19,0.25);color:#212121}
+#topbar button.active{background:linear-gradient(180deg,#A1887F,#8D6E63);border-color:rgba(139,69,19,0.35);color:#3E2723}
+#topbar button.navy{background:linear-gradient(180deg,#D7CCC8,#BCAAA4);border:1px solid rgba(139,69,19,0.2);color:#3E2723;font-size:10px;padding:3px 9px;cursor:pointer;border-radius:4px;height:24px;white-space:nowrap;transition:all 0.15s}
+#topbar button.navy:hover{background:linear-gradient(180deg,#E0E0E0,#D7CCC8);border-color:rgba(139,69,19,0.3);color:#212121}
+#topbar .info{color:rgba(91,63,29,0.7);font-size:9px;margin-left:auto;font-family:'Courier New',monospace;white-space:nowrap}
+#sidebar{display:none;position:fixed;top:38px;left:0;width:280px;bottom:30px;background:rgba(253,248,240,0.95);border-right:1px solid rgba(139,69,19,0.15);z-index:50;overflow-y:auto;padding:0;backdrop-filter:blur(8px)}
+#sidebar .pane{border-bottom:1px solid rgba(139,69,19,0.08);padding:8px 12px}
+#sidebar .pane-title{color:rgba(139,69,19,0.7);font-size:8px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600}
+.srow{display:flex;justify-content:space-between;padding:3px 0;font-size:10px;line-height:1.6}.srow .l{color:rgba(91,63,29,0.6);font-size:9px}.srow .r{color:#5D4037;font-weight:500;font-size:10px}
+.srow .r.enemy{color:#B71C1C}.srow .r.friendly{color:#1565C0}.srow .r.warn{color:#8D6E63}.srow .r.good{color:#2E7D32}
 .unit-entry{padding:3px 8px;font-size:9px;cursor:pointer;border-radius:3px;display:flex;align-items:center;gap:5px;margin:2px 0;border:1px solid transparent}
-.unit-entry:hover{background:rgba(255,170,64,0.04)}.unit-entry.sel{background:rgba(255,170,64,0.08);border-color:rgba(255,170,64,0.12)}
-.unit-entry .uname{color:#c8d8e8;flex:1;overflow:hidden;text-overflow:ellipsis}.unit-entry .uhp{color:rgba(90,122,138,0.5);font-size:8px}
-#sidebar .mbtn{background:linear-gradient(180deg,#1a2a3a,#121a28);border:1px solid rgba(255,170,64,0.1);color:#b8d8f0;font-size:10px;padding:4px 8px;cursor:pointer;border-radius:3px;width:100%;text-align:center;margin:2px 0}.mbtn.danger{color:#ff6666}
-#logbar{display:none;position:fixed;bottom:0;left:280px;right:0;height:30px;background:rgba(8,12,20,0.92);border-top:1px solid rgba(255,170,64,0.08);z-index:50;display:flex;align-items:center;padding:0 10px}
-#logbar .msg{color:rgba(90,122,138,0.7);font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New',monospace}
-#logbar .time{color:rgba(255,170,64,0.4);font-size:8px;margin-right:8px;font-family:'Courier New',monospace}
-#modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.65);z-index:200;justify-content:center;align-items:center}
-#modal.show{display:flex}#modal .box{background:linear-gradient(180deg,#152030,#0e1622);border:1px solid rgba(255,170,64,0.15);border-radius:8px;padding:16px;min-width:320px;max-width:420px}
-#modal .box h3{color:#ffaa40;font-size:13px;margin-bottom:12px}
-#modal .box label{color:rgba(90,122,138,0.7);font-size:10px;display:block;margin:8px 0 3px}
-#modal .box input,#modal .box select{width:100%;background:rgba(10,15,22,0.8);border:1px solid rgba(255,170,64,0.1);color:#c8d8e8;padding:6px 10px;font-size:11px;border-radius:4px}
+.unit-entry:hover{background:rgba(139,69,19,0.03)}.unit-entry.sel{background:rgba(139,69,19,0.1);border-color:rgba(139,69,19,0.15)}
+.unit-entry .uname{color:#3E2723;flex:1;overflow:hidden;text-overflow:ellipsis}.unit-entry .uhp{color:rgba(91,63,29,0.5);font-size:8px}
+#sidebar .mbtn{background:linear-gradient(180deg,#D7CCC8,#BCAAA4);border:1px solid rgba(139,69,19,0.1);color:#3E2723;font-size:10px;padding:4px 8px;cursor:pointer;border-radius:3px;width:100%;text-align:center;margin:2px 0}.mbtn.danger{color:#B71C1C}
+#logbar{display:none;position:fixed;bottom:0;left:280px;right:0;height:30px;background:rgba(253,248,240,0.95);border-top:1px solid rgba(139,69,19,0.15);z-index:50;display:flex;align-items:center;padding:0 10px}
+#logbar .msg{color:rgba(91,63,29,0.6);font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New',monospace}
+#logbar .time{color:rgba(139,69,19,0.3);font-size:8px;margin-right:8px;font-family:'Courier New',monospace}
+#modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:200;justify-content:center;align-items:center}
+#modal.show{display:flex}#modal .box{background:#FFF8E1;border:1px solid rgba(139,69,19,0.2);border-radius:8px;padding:16px;min-width:320px;max-width:420px}
+#modal .box h3{color:#8B4513;font-size:13px;margin-bottom:12px}
+#modal .box label{color:rgba(91,63,29,0.6);font-size:10px;display:block;margin:8px 0 3px}
+#modal .box input,#modal .box select{width:100%;background:#FFF8E1;border:1px solid rgba(139,69,19,0.15);color:#3E2723;padding:6px 10px;font-size:11px;border-radius:4px}
 #statusOverlay{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:90;pointer-events:none;display:none;text-align:center}
-#statusOverlay{display:block;pointer-events:auto}#statusOverlay .main{font-size:28px;font-weight:700;color:#ffaa44}#statusOverlay .sub{font-size:13px;opacity:0.5;letter-spacing:2px}
-#statusOverlay .close-btn{display:none;margin-top:20px;padding:10px 32px;background:rgba(40,60,80,0.5);border:1px solid rgba(255,255,255,0.1);color:#8ab4e8;font-size:13px;cursor:pointer;border-radius:5px;letter-spacing:1px}
+#statusOverlay{display:block;pointer-events:auto}#statusOverlay .main{font-size:28px;font-weight:700;color:#8B4513}#statusOverlay .sub{font-size:13px;opacity:0.5;letter-spacing:2px}
+#statusOverlay .close-btn{display:none;margin-top:20px;padding:10px 32px;background:rgba(139,69,19,0.3);border:1px solid rgba(139,69,19,0.4);color:#5D4037;font-size:13px;cursor:pointer;border-radius:5px;letter-spacing:1px}
 #statusOverlay.show .close-btn{display:inline-block}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,170,64,0.15)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(139,69,19,0.15)}
 </style>
 </head>
 <body>
@@ -76,11 +76,13 @@ canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%;backgrou
 <div id="mainMenu">
   <div class="title">⚡ COMMAND CHAOS</div>
   <div class="subtitle">Modern Warfare · Strategy · Mayhem</div>
-  <div class="menu-btns">
-    <button class="menu-btn" onclick="showMissions()" style="border-color:rgba(255,200,64,0.3);color:#ffcc44">📋 MISSIONS</button>
+    <div class="menu-btns">
+    <button class="menu-btn" onclick="showMissions()" style="border-color:rgba(139,69,19,0.25);color:#5D4037">📋 MISSIONS</button>
     <button class="menu-btn" onclick="startScenario('blank')">🗺️ BLANK SCENARIO</button>
-    <button class="menu-btn" onclick="showGuide()" style="border-color:rgba(100,200,255,0.3);color:#6ac8ff">📖 GUIDE</button>
-    <button class="menu-btn" onclick="showAboutMe()" style="border-color:rgba(255,100,100,0.2);color:#ff8899">👋 ABOUT ME</button>
+    <button class="menu-btn" onclick="showGuide()" style="border-color:rgba(139,69,19,0.2);color:#5D4037">📖 GUIDE</button>
+    <button class="menu-btn" onclick="showAboutMe()" style="border-color:rgba(139,69,19,0.15);color:#5D4037">👋 ABOUT ME</button>
+    <button class="menu-btn" onclick="showPrivacyPolicy()" style="border-color:rgba(139,69,19,0.25);color:#5D4037">🔒 PRIVACY POLICY</button>
+    <button class="menu-btn" onclick="showTerms()" style="border-color:rgba(139,69,19,0.25);color:#5D4037">📜 TERMS & CONDITIONS</button>
   </div>
   <div class="social-links">
     <a class="social-btn" href="https://www.tiktok.com/@commandchaos?_r=1&_t=ZS-97JftPCVwbx" target="_blank">🎵 TIKTOK</a>
@@ -92,27 +94,39 @@ canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%;backgrou
 window.showGuide = function() {
   var d = document.createElement('div');
   d.id = 'guideOverlay';
-  d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#060a10;z-index:9999;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:30px;overflow-y:auto';
-  d.innerHTML = '<div style="max-width:750px;width:100%"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px"><h2 style="color:#ffaa40;font-size:28px;font-weight:700">📖 GAME GUIDE</h2><button onclick="document.getElementById(\'guideOverlay\').remove()" style="padding:12px 28px;background:linear-gradient(180deg,rgba(40,60,80,0.6),rgba(20,35,55,0.6));border:1px solid rgba(255,170,64,0.25);color:#ffaa40;font-size:14px;cursor:pointer;border-radius:6px;font-weight:600">⬅ BACK TO MENU</button></div>' +
-    '<div style="background:rgba(30,40,60,0.3);border:1px solid rgba(255,170,64,0.12);border-radius:8px;padding:18px;margin-bottom:16px"><div style="color:#ffaa40;font-size:16px;font-weight:700;margin-bottom:10px">🎮 HOW TO PLAY</div><div style="font-size:13px;color:#c8ddf0;line-height:1.8">Click <b style="color:#ffcc44">MISSIONS</b> for pre-built battles or <b style="color:#ffcc44">BLANK SCENARIO</b> to build your own. Press <b style="color:#5aacff">▶ PLAY</b> to start the action. Your units will automatically find and engage enemies. Use the speed buttons to control time.</div></div>' +
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f0e8;z-index:9999;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:30px;overflow-y:auto';
+  d.innerHTML = '<div style="max-width:750px;width:100%"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px"><h2 style="color:#8B4513;font-size:28px;font-weight:700">📖 GAME GUIDE</h2><button onclick="document.getElementById(\'guideOverlay\').remove()" style="padding:12px 28px;background:linear-gradient(180deg,#D7CCC8,#BCAAA4);border:1px solid rgba(139,69,19,0.3);color:#3E2723;font-size:14px;cursor:pointer;border-radius:6px;font-weight:600">⬅ BACK TO MENU</button></div>' +
+    '<div style="background:rgba(139,69,19,0.05);border:1px solid rgba(139,69,19,0.12);border-radius:8px;padding:18px;margin-bottom:16px"><div style="color:#8B4513;font-size:16px;font-weight:700;margin-bottom:10px">🎮 HOW TO PLAY</div><div style="font-size:13px;color:#5D4037;line-height:1.8">Click <b style="color:#8B4513">MISSIONS</b> for pre-built battles or <b style="color:#8B4513">BLANK SCENARIO</b> to build your own. Press <b style="color:#8B4513">▶ PLAY</b> to start the action. Your units will automatically find and engage enemies. Use the speed buttons to control time.</div></div>' +
     '<div style="color:#ffaa40;font-size:15px;font-weight:700;margin:14px 0 8px">🖥️ TOP BAR CONTROLS</div>' +
-    '<div style="background:rgba(30,40,60,0.3);border:1px solid rgba(255,170,64,0.12);border-radius:8px;padding:16px;margin-bottom:12px">' +
-    ['▶ PLAY — Start/pause the simulation','½× 1× 5× 10× — Speed controls','✈ ACFT — Place aircraft','🚀 SAM — Place SAM site','🚢 NAVAL — Place ship on water','⚡ BAL — Place ballistic missile','🏠 BASE — Place airbase','🏗️ BUILD — Place a building','📋 COPY — Duplicate selected unit','💾 SAVE — Save your game','📂 LOAD — Load saved game','🚩 SIDE — View side relations','☰ MENU — Return to main menu'].map(t=>'<div style="display:flex;gap:12px;padding:4px 0;font-size:12px;align-items:center"><span style="color:#ffaa40;font-weight:600;min-width:130px">' + t.split(' — ')[0] + '</span><span style="color:#c8ddf0">' + t.split(' — ')[1] + '</span></div>').join('') +
+    '<div style="background:rgba(139,69,19,0.05);border:1px solid rgba(139,69,19,0.12);border-radius:8px;padding:16px;margin-bottom:12px">' +
+    ['▶ PLAY — Start/pause the simulation','½× 1× 5× 10× — Speed controls','✈ ACFT — Place aircraft','🚀 SAM — Place SAM site','🚢 NAVAL — Place ship on water','⚡ BAL — Place ballistic missile','🏠 BASE — Place airbase','🏗️ BUILD — Place a building','📋 COPY — Duplicate selected unit','💾 SAVE — Save your game','📂 LOAD — Load saved game','🚩 SIDE — View side relations','☰ MENU — Return to main menu'].map(t=>'<div style="display:flex;gap:12px;padding:4px 0;font-size:12px;align-items:center"><span style="color:#8B4513;font-weight:600;min-width:130px">' + t.split(' — ')[0] + '</span><span style="color:#5D4037">' + t.split(' — ')[1] + '</span></div>').join('') +
     '</div>' +
-    '<div style="background:rgba(255,170,64,0.05);border:1px solid rgba(255,170,64,0.12);border-radius:8px;padding:16px;margin-bottom:10px"><div style="font-size:13px;color:#c8ddf0;line-height:1.8;text-align:center">Game by <b style="color:#ff8899">Riyaan</b> ❤️ — <b style="color:#ffaa40">Command Chaos</b></div></div></div>';
+    '<div style="background:rgba(139,69,19,0.05);border:1px solid rgba(139,69,19,0.12);border-radius:8px;padding:16px;margin-bottom:10px"><div style="font-size:13px;color:#5D4037;line-height:1.8;text-align:center">Game by <b style="color:#8B4513">Riyaan</b> ❤️ — <b style="color:#8B4513">Command Chaos</b></div></div></div>';
   document.body.appendChild(d);
 };
 window.showMissions = function() {
   var d = document.createElement('div');
   d.id = 'missionsOverlay';
-  d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#060a10;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px';
-  d.innerHTML = '<div style="max-width:500px;width:100%;text-align:center"><h2 style="color:#ffcc44;font-size:22px;font-weight:700;margin-bottom:24px">🎯 MISSIONS</h2><div style="display:flex;flex-direction:column;gap:14px"><button onclick="this.closest(\'#missionsOverlay\').remove();startScenario(\'middle_east\')" style="width:100%;padding:16px 24px;background:linear-gradient(180deg,rgba(50,30,10,0.6),rgba(30,18,6,0.6));border:1px solid rgba(255,170,64,0.4);color:#ffaa40;font-size:14px;cursor:pointer;border-radius:6px;text-align:left"><div style="font-weight:700;font-size:15px">🌍 MIDDLE EAST · Iran Strike</div><div style="font-size:10px;color:rgba(255,170,64,0.5);margin-top:4px">F-35A + Rafale stealth strike vs Iranian S-400</div></button><button onclick="this.closest(\'#missionsOverlay\').remove();startScenario(\'north_africa\')" style="width:100%;padding:16px 24px;background:linear-gradient(180deg,rgba(20,50,20,0.6),rgba(10,25,10,0.6));border:1px solid rgba(96,208,128,0.4);color:#60d080;font-size:14px;cursor:pointer;border-radius:6px;text-align:left"><div style="font-weight:700;font-size:15px">🌍 NORTH AFRICA · Desert Storm</div><div style="font-size:10px;color:rgba(96,208,128,0.5);margin-top:4px">F-16 + A-10 + F-15E vs Libya</div></button><button onclick="this.closest(\'#missionsOverlay\').remove();startScenario(\'ukraine_russia\')" style="width:100%;padding:16px 24px;background:linear-gradient(180deg,rgba(20,30,60,0.6),rgba(10,15,30,0.6));border:1px solid rgba(100,150,255,0.4);color:#6699ff;font-size:14px;cursor:pointer;border-radius:6px;text-align:left"><div style="font-weight:700;font-size:15px">🌍 UKRAINE · Eastern Front</div><div style="font-size:10px;color:rgba(100,150,255,0.5);margin-top:4px">Su-27 + Su-25 vs Russian S-400</div></button></div><button onclick="this.parentElement.parentElement.remove()" style="margin-top:30px;padding:12px 48px;background:linear-gradient(180deg,rgba(20,40,60,0.5),rgba(10,20,30,0.5));border:1px solid rgba(43,111,219,0.2);color:#8ab4e8;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1.5px">⬅ BACK TO MENU</button></div>';
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f0e8;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px';
+  d.innerHTML = '<div style="max-width:500px;width:100%;text-align:center"><h2 style="color:#8B4513;font-size:22px;font-weight:700;margin-bottom:24px">🎯 MISSIONS</h2><div style="display:flex;flex-direction:column;gap:14px"><button onclick="this.closest(\'#missionsOverlay\').remove();startScenario(\'middle_east\')" style="width:100%;padding:16px 24px;background:linear-gradient(180deg,rgba(139,69,19,0.1),rgba(101,55,13,0.1));border:1px solid rgba(139,69,19,0.3);color:#5D4037;font-size:14px;cursor:pointer;border-radius:6px;text-align:left"><div style="font-weight:700;font-size:15px">🌍 MIDDLE EAST · Iran Strike</div><div style="font-size:10px;color:rgba(139,69,19,0.4);margin-top:4px">F-35A + Rafale stealth strike vs Iranian S-400</div></button><button onclick="this.closest(\'#missionsOverlay\').remove();startScenario(\'north_africa\')" style="width:100%;padding:16px 24px;background:linear-gradient(180deg,rgba(46,125,50,0.1),rgba(27,94,32,0.1));border:1px solid rgba(46,125,50,0.3);color:#2E7D32;font-size:14px;cursor:pointer;border-radius:6px;text-align:left"><div style="font-weight:700;font-size:15px">🌍 NORTH AFRICA · Desert Storm</div><div style="font-size:10px;color:rgba(96,208,128,0.5);margin-top:4px">F-16 + A-10 + F-15E vs Libya</div></button><button onclick="this.closest(\'#missionsOverlay\').remove();startScenario(\'ukraine_russia\')" style="width:100%;padding:16px 24px;background:linear-gradient(180deg,rgba(21,101,192,0.1),rgba(14,69,153,0.1));border:1px solid rgba(21,101,192,0.3);color:#1565C0;font-size:14px;cursor:pointer;border-radius:6px;text-align:left"><div style="font-weight:700;font-size:15px">🌍 UKRAINE · Eastern Front</div><div style="font-size:10px;color:rgba(100,150,255,0.5);margin-top:4px">Su-27 + Su-25 vs Russian S-400</div></button></div><button onclick="this.parentElement.parentElement.remove()" style="margin-top:30px;padding:12px 48px;background:linear-gradient(180deg,#D7CCC8,#BCAAA4);border:1px solid rgba(139,69,19,0.3);color:#3E2723;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1.5px">⬅ BACK TO MENU</button></div>';
+  document.body.appendChild(d);
+};
+window.showPrivacyPolicy = function() {
+  var d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f0e8;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;overflow-y:auto';
+  d.innerHTML = '<div style="max-width:700px;width:100%"><h2 style="color:#8B4513;font-size:28px;font-weight:700;margin-bottom:24px">🔒 PRIVACY POLICY</h2><div style="font-size:13px;color:#5D4037;line-height:1.8"><p><b style="color:#8B4513">Last updated: September 2025</b></p><p>This Privacy Policy describes how Command Chaos collects, uses, and protects your information when you use our game.</p><p style="margin-top:12px"><b style="color:#8B4513">1. Information We Collect</b></p><p>We collect only the minimum information necessary for game functionality: your Google account email (used solely for cloud save identification), and optional in-game preferences stored locally. We do not collect device identifiers, IP addresses, precise location, or any personal data beyond what is necessary to sync your saves.</p><p style="margin-top:12px"><b style="color:#8B4513">2. How We Use Your Information</b></p><p>Your email is used exclusively to associate and sync your game saves to your account. We do not use it for marketing, analytics, or share it with third parties. No advertising or tracking is present in this game.</p><p style="margin-top:12px"><b style="color:#8B4513">3. Data Storage and Security</b></p><p>Saves are stored in an encrypted Supabase database. We do not share your data with third parties. You may delete your account data at any time by contacting us.</p><p style="margin-top:12px"><b style="color:#8B4513">4. Children</b></p><p>This game is not intended for children under 13. We do not knowingly collect data from children.</p><p style="margin-top:12px"><b style="color:#8B4513">5. Changes to This Policy</b></p><p>We may update this policy. Any changes will be posted here with an updated revision date.</p><p style="margin-top:12px"><b style="color:#8B4513">6. Contact</b></p><p>If you have questions, please contact us via the social links in the game menu.</p><p style="margin-top:24px;color:#8B4513;font-weight:600">\u2014 Command Chaos Team</p></div><button onclick="this.parentElement.parentElement.remove()" style="margin-top:30px;padding:12px 48px;background:linear-gradient(180deg,#D7CCC8,#BCAAA4);border:1px solid rgba(139,69,19,0.3);color:#3E2723;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1.5px">\u2b05 BACK TO MENU</button></div>';
+  document.body.appendChild(d);
+};
+window.showTerms = function() {
+  var d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f0e8;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;overflow-y:auto';
+  d.innerHTML = '<div style="max-width:700px;width:100%"><h2 style="color:#8B4513;font-size:28px;font-weight:700;margin-bottom:24px">\U0001F4CC TERMS & CONDITIONS</h2><div style="font-size:13px;color:#5D4037;line-height:1.8"><p><b style="color:#8B4513">Last updated: September 2025</b></p><p>These Terms govern your use of Command Chaos.</p><p style="margin-top:12px"><b style="color:#8B4513">1. License</b></p><p>You may install and use this game for personal, non-commercial use only. Reproduction, redistribution, or commercial use of the game or its assets without explicit permission is prohibited.</p><p style="margin-top:12px"><b style="color:#8B4513">2. User Accounts</b></p><p>A Google account is required for cloud save functionality. You are responsible for maintaining the security of your account. The game does not store passwords — authentication is handled entirely by Google.</p><p style="margin-top:12px"><b style="color:#8B4513">3. No Warranty</b></p><p>The game is provided "as is" without warranties of any kind. While we strive to maintain functional game saves, we do not guarantee uptime or data integrity. Local save backups are recommended.</p><p style="margin-top:12px"><b style="color:#8B4513">4. Limitation of Liability</b></p><p>To the fullest extent permitted by law, the developer disclaims liability for any indirect, incidental, or consequential damages arising from your use of the game.</p><p style="margin-top:12px"><b style="color:#8B4513">5. Termination</b></p><p>We may suspend or terminate access to the game or services at our sole discretion, without notice or liability.</p><p style="margin-top:12px"><b style="color:#8B4513">6. Governing Law</b></p><p>These terms are governed by applicable law. Any disputes shall be resolved in the jurisdiction of the developer\'s residence.</p><p style="margin-top:24px;color:#8B4513;font-weight:600">\u2014 Command Chaos Team</p></div><button onclick="this.parentElement.parentElement.remove()" style="margin-top:30px;padding:12px 48px;background:linear-gradient(180deg,#D7CCC8,#BCAAA4);border:1px solid rgba(139,69,19,0.3);color:#3E2723;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1.5px">\u2b05 BACK TO MENU</button></div>';
   document.body.appendChild(d);
 };
 window.showAboutMe = function() {
   var d = document.createElement('div');
-  d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#060a10;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px';
-  d.innerHTML = '<div style="max-width:600px;width:100%;text-align:center"><h1 style="font-size:48px;margin-bottom:8px">👋</h1><h2 style="color:#8ab4e8;font-size:22px;font-weight:700;margin-bottom:20px">About Me</h2><div style="font-size:14px;color:#b0c8d8;line-height:1.8"><p>Hi, I\'m Riyaan, a solo game developer. This game is the result of countless hours of work, learning, and dedication. I don\'t have a large studio, a publisher, or a team behind me—just a passion for creating games and bringing my ideas to life.</p><p style="margin-top:16px">Game development is currently my only source of income, so every purchase, review, and share directly helps me continue working on this project and creating future updates. When you support this game, you\'re supporting a real person chasing a dream.</p><p style="margin-top:16px">If you\'ve enjoyed playing, please consider following on TikTok and Instagram and telling a friend about it. Even small acts of support make a huge difference.</p><p style="margin-top:24px;color:#ff8899;font-size:16px;font-weight:600">— Riyaan ❤️</p></div><button onclick="this.parentElement.parentElement.remove()" style="margin-top:30px;padding:12px 48px;background:linear-gradient(180deg,rgba(20,40,60,0.5),rgba(10,20,30,0.5));border:1px solid rgba(43,111,219,0.2);color:#8ab4e8;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1.5px">⬅ BACK TO MENU</button></div>';
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f0e8;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px';
+  d.innerHTML = '<div style="max-width:600px;width:100%;text-align:center"><h1 style="font-size:48px;margin-bottom:8px">👋</h1><h2 style="color:#8B4513;font-size:22px;font-weight:700;margin-bottom:20px">About Me</h2><div style="font-size:14px;color:#5D4037;line-height:1.8"><p>Hi, I\'m Riyaan, a solo game developer. This game is the result of countless hours of work, learning, and dedication. I don\'t have a large studio, a publisher, or a team behind me—just a passion for creating games and bringing my ideas to life.</p><p style="margin-top:16px">Game development is currently my only source of income, so every purchase, review, and share directly helps me continue working on this project and creating future updates. When you support this game, you\'re supporting a real person chasing a dream.</p><p style="margin-top:16px">If you\'ve enjoyed playing, please consider following on TikTok and Instagram and telling a friend about it. Even small acts of support make a huge difference.</p><p style="margin-top:24px;color:#8B4513;font-size:16px;font-weight:600">— Riyaan ❤️</p></div><button onclick="this.parentElement.parentElement.remove()" style="margin-top:30px;padding:12px 48px;background:linear-gradient(180deg,#D7CCC8,#BCAAA4);border:1px solid rgba(139,69,19,0.3);color:#3E2723;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1.5px">⬅ BACK TO MENU</button></div>';
   document.body.appendChild(d);
 };
 </script>
@@ -265,6 +279,6 @@ window.showAboutMe = function() {
 <script src="terrain.js"></script>
 <script src="supabaseBridge.js?v=6"></script>
 <script src="js/CORE/game.js?v=10"></script>
-<script src="js/CORE/game_render.js?v=5"></script>
+<script src="js/CORE/game_render.js?v=6"></script>
 </body>
 </html>
