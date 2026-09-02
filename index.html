@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.supabase.co; connect-src 'self' https://*.supabase.co; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src https://accounts.google.com;">
+  <!-- Security: Prevent MIME sniffing, XSS, clickjacking -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
 <title>Command Chaos</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -174,9 +180,24 @@ window.showAboutMe = function() {
       // DON'T auto-probe session or auto-pass the gate.  The login gate
       // stays visible until the user clicks "Google Sign In" or uses the
             // stays visible until the user clicks "Google Sign In".
-      if (gateEl) gateEl.style.display = 'flex';
+            if (gateEl) gateEl.style.display = 'flex';
       if (googleBtn) {
         googleBtn.onclick = async () => {
+          // --- RATE LIMITING: max 3 login attempts per device per day ---
+          const today = new Date().toISOString().slice(0, 10);
+          const key = 'cmo_login_attempts_' + today;
+          let attempts = parseInt(localStorage.getItem(key) || '0');
+          if (attempts >= 3) {
+            googleBtn.disabled = true;
+            googleBtn.textContent = 'LIMIT REACHED · TRY TOMORROW';
+            googleBtn.style.background = '#ccc';
+            googleBtn.style.cursor = 'not-allowed';
+            console.warn('[gate] Login rate limit reached (3/day)');
+            return;
+          }
+          // Increment attempt counter
+          localStorage.setItem(key, String(attempts + 1));
+          // -------------------------------------------------------------
           googleBtn.disabled = true; googleBtn.textContent = 'REDIRECTING...';
           sessionStorage.setItem('_loginInitiated', 'true');  // survives redirect
           try {
@@ -280,5 +301,21 @@ window.showAboutMe = function() {
 <script src="supabaseBridge.js?v=6"></script>
 <script src="js/CORE/game.js?v=10"></script>
 <script src="js/CORE/game_render.js?v=6"></script>
+
+<!-- Security hardening: prevent canvas/image drag-save, right-click context, and key print tricks -->
+<script>
+  // Disable right-click to prevent easy "save canvas as" / image theft
+  window.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+  // Disable drag on canvas to prevent partial image extraction
+  window.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
+  // Prevent selecting/copying DOM text (game data stays in JS memory)
+  document.onselectstart = function() { return false; };
+  // Block common devtools-inspect shortcuts
+  window.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || e.key === 'F12') {
+      e.preventDefault(); return false;
+    }
+  });
+</script>
 </body>
 </html>
